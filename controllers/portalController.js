@@ -32,7 +32,7 @@ export const loginUser = async (req, res) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '15s',
     })
 
     return res.status(201).json({
@@ -49,6 +49,33 @@ export const loginUser = async (req, res) => {
   }
 }
 
+export const refreshToken = (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: 'Refresh token missing' });
+  }
+
+  try {
+    const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const newToken = jwt.sign(
+      { 
+        id: payload.id, 
+        email: payload.email, 
+        role: payload.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '15s' }
+    );
+
+    return res.json({ token: newToken });
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid refresh token' });
+  }
+};
+
 export const portalController = {
   loginUser,
+  refreshToken,
 }
