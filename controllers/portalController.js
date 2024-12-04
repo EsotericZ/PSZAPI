@@ -1,52 +1,34 @@
 import query from '../db/index.js';
 
-export const createUser = async (req, res) => {
-  const { email } = req.body.userData;
-  console.log('create')
-  console.log(email)
-
-  try {
-    const statement = `
-      INSERT INTO users (email)
-      VALUES ($1)
-      RETURNING *
-    `;
-    const { rows } = await query(statement, [email]);
-
-    res.status(201).send({ status: 'success', user: rows[0] });
-  } catch (error) {
-    console.error('Error creating new User', error);
-    res.status(500).send({ error: 'Unable To Create New User' });
-  }
-}
-
 export const loginUser = async (req, res) => {
-  const { email } = req.body.userData;
-  console.log('login')
-  console.log(email)
+  const { email } = req.body;
   
   try {
-    const statement = `
+    const checkUserQuery  = `
       SELECT *
       FROM users
       WHERE email = $1
     `;
-    const { rows, rowCount } = await query(statement, [email]);
-    console.log(rows)
-    console.log(rowCount)
+    const { rows, rowCount } = await query(checkUserQuery , [email]);
 
-    if (rowCount === 0) {
-      return res.status(404).json({ status: 'not_found' });
+    if (rowCount > 0) {
+      return res.status(200).json(rows[0]);
+    } else {
+      const createUserQuery = `
+        INSERT INTO users (email)
+        VALUES ($1)
+        RETURNING *
+      `;
+      const { rows: newRow } = await query(createUserQuery, [email]);
+
+      return res.status(201).json(newRow[0]);
     }
-
-    return res.status(200).json({ status: 'success', user: rows[0] });
   } catch (error) {
-    console.error('Error finding user:', error);
+    console.error('Error Handling User Login:', error);
     return res.status(500).json({ status: 'error', message: error.message });
   }
 }
 
 export const portalController = {
-  createUser,
   loginUser,
 }
