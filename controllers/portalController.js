@@ -32,15 +32,11 @@ export const loginUser = async (req, res) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '15s',
+      expiresIn: '15m',
     })
 
     return res.status(201).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
+      user: payload,
       token,
     });
   } catch (error) {
@@ -63,10 +59,10 @@ export const refreshToken = (req, res) => {
       { 
         id: payload.id, 
         email: payload.email, 
-        role: payload.role 
+        role: payload.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '15s' }
+      { expiresIn: '15m' }
     );
 
     return res.json({ token: newToken });
