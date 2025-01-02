@@ -31,13 +31,18 @@ export const loginUser = async (req, res) => {
       role: user.role || 2001,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '15m',
-    })
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: '10s',
+    });
+
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: '7d',
+    });
 
     return res.status(201).json({
       user: payload,
-      token,
+      token: accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.error('Error Handling User Login:', error);
@@ -46,7 +51,7 @@ export const loginUser = async (req, res) => {
 }
 
 export const refreshToken = (req, res) => {
-  const refreshToken = req.cookies?.refreshToken;
+  const { refreshToken } = req.body;
 
   if (!refreshToken) {
     return res.status(401).json({ message: 'Refresh token missing' });
@@ -62,11 +67,12 @@ export const refreshToken = (req, res) => {
         role: payload.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
-    return res.json({ token: newToken });
+    return res.status(200).json({ token: newToken });
   } catch (error) {
+    console.error('JWT verification error:', error.message);
     return res.status(403).json({ message: 'Invalid refresh token' });
   }
 };
