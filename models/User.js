@@ -38,7 +38,7 @@ User.init(
       },
     },
     psnAccountId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
     },
     psnAvatar: {
       type: DataTypes.STRING(255),
