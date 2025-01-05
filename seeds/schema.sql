@@ -71,6 +71,15 @@ CREATE TABLE IF NOT EXISTS backlog (
   CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
 );
 
+-- Wishlist Table
+CREATE TABLE IF NOT EXISTS wishlist (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  gameId UUID NOT NULL,
+  userId UUID NOT NULL,
+  CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE,
+  CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+);
+
 -- ==========================
 -- PERFORMANCE INDEXES
 -- ==========================
@@ -82,3 +91,7 @@ CREATE INDEX idx_collection_userId ON collection (userId);
 -- Index For Backlog
 CREATE INDEX idx_backlog_gameId ON backlog (gameId);
 CREATE INDEX idx_backlog_userId ON backlog (userId);
+
+-- Index For Wishlist
+CREATE INDEX idx_wishlist_gameId ON wishlist (gameId);
+CREATE INDEX idx_wishlist_userId ON wishlist (userId);

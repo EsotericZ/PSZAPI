@@ -3,6 +3,7 @@ import Collection from './Collection.js';
 import Featured from './Featured.js';
 import Game from './Game.js';
 import User from './User.js';
+import Wishlist from './Wishlist.js';
 
 // Featured to Game Relationships
 Featured.belongsTo(Game, { 
@@ -57,10 +58,32 @@ User.hasMany(Backlog, {
   as: 'backlogs',
 });
 
+// Wishlist Relationships
+Wishlist.belongsTo(Game, {
+  foreignKey: 'gameId',
+  as: 'game',
+});
+
+Wishlist.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+Game.hasMany(Wishlist, {
+  foreignKey: 'gameId',
+  as: 'wishlists',
+});
+
+User.hasMany(Wishlist, {
+  foreignKey: 'userId',
+  as: 'wishlists',
+});
+
 export {
   Backlog,
   Collection,
   Featured,
   Game,
   User,
+  Wishlist,
 };
