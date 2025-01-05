@@ -49,6 +49,16 @@ CREATE TABLE IF NOT EXISTS ratings (
   CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
 );
 
+-- Reviews Table
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  rating FLOAT,
+  review TEXT,
+  goty BOOLEAN DEFAULT FALSE,
+  gameId UUID NOT NULL,
+  CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE
+);
+
 -- Collection Table
 CREATE TABLE IF NOT EXISTS collection (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -94,6 +104,9 @@ CREATE TABLE IF NOT EXISTS wishlist (
 -- Index For Rating
 CREATE INDEX idx_rating_gameId ON ratings (gameId);
 CREATE INDEX idx_rating_userId ON ratings (userId);
+
+-- Index For Review
+CREATE INDEX idx_rating_gameId ON ratings (gameId);
 
 -- Index For Collection
 CREATE INDEX idx_collection_gameId ON collection (gameId);
