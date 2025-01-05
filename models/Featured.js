@@ -21,7 +21,7 @@ Featured.init(
       references: {
         model: 'games',
         key: 'id',
-      }
+      },
     },
   },
   {
