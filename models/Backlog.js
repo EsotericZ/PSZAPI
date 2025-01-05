@@ -31,14 +31,6 @@ Backlog.init(
       type: DataTypes.STRING(20),
       allowNull: false,
     },
-    userRating: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    userComments: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
     order: {
       type: DataTypes.INTEGER,
       allowNull: false,

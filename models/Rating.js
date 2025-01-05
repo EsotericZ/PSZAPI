@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/connection';
 
-class Collection extends Model {}
+class Rating extends Model {}
 
-Collection.init(
+Rating.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -11,25 +11,17 @@ Collection.init(
       primaryKey: true,
       allowNull: false,
     },
-    psnName: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+    userRating: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
-    psnIcon: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+    userReview: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
-    progress: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    platinum: {
+    goty: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    },
-    status: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
     },
     gameId: {
       type: DataTypes.UUID,
@@ -50,10 +42,10 @@ Collection.init(
   },
   {
     sequelize,
-    modelName: 'Collection',
-    tableName: 'collection',
+    modelName: 'Rating',
+    tableName: 'ratings',
     timestamps: false,
   }
 );
 
-export default Collection;
+export default Rating;
