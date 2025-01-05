@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS backlog (
   progress INTEGER NOT NULL,
   platinum BOOLEAN DEFAULT FALSE,
   status VARCHAR(20) NOT NULL,
-  order INTEGER NOT NULL,
+  "order" INTEGER NOT NULL,
   gameId UUID NOT NULL,
   userId UUID NOT NULL,
   CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE,
@@ -106,7 +106,7 @@ CREATE INDEX idx_rating_gameId ON ratings (gameId);
 CREATE INDEX idx_rating_userId ON ratings (userId);
 
 -- Index For Review
-CREATE INDEX idx_rating_gameId ON ratings (gameId);
+CREATE INDEX idx_review_gameId ON ratings (gameId);
 
 -- Index For Collection
 CREATE INDEX idx_collection_gameId ON collection (gameId);
