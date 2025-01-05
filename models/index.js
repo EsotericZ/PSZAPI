@@ -1,3 +1,4 @@
+import Backlog from './Backlog.js';
 import Collection from './Collection.js';
 import Featured from './Featured.js';
 import Game from './Game.js';
@@ -35,7 +36,29 @@ User.hasMany(Collection, {
   as: 'collections',
 });
 
+// Backlog Relationships
+Backlog.belongsTo(Game, {
+  foreignKey: 'gameId',
+  as: 'game',
+});
+
+Backlog.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+Game.hasMany(Backlog, {
+  foreignKey: 'gameId',
+  as: 'backlogs',
+});
+
+User.hasMany(Backlog, {
+  foreignKey: 'userId',
+  as: 'backlogs',
+});
+
 export {
+  Backlog,
   Collection,
   Featured,
   Game,

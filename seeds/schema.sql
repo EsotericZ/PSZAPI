@@ -34,10 +34,10 @@ CREATE TABLE IF NOT EXISTS games (
   rating FLOAT,
   ratingTop FLOAT,
   released VARCHAR(10) NOT NULL,
-  slug VARCHAR(255),
+  slug VARCHAR(255)
 );
 
--- Collections Table
+-- Collection Table
 CREATE TABLE IF NOT EXISTS collection (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   psnName VARCHAR(100) NOT NULL,
@@ -50,16 +50,35 @@ CREATE TABLE IF NOT EXISTS collection (
   goty BOOLEAN DEFAULT FALSE,
   gameId UUID NOT NULL,
   userId UUID NOT NULL,
-  CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id),
-  CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id)
+  CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE,
+  CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- Backlog Table
+CREATE TABLE IF NOT EXISTS backlog (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  psnName VARCHAR(100) NOT NULL,
+  psnIcon VARCHAR(255) NOT NULL,
+  progress INTEGER NOT NULL,
+  platinum BOOLEAN DEFAULT FALSE,
+  status VARCHAR(20) NOT NULL,
+  userRating FLOAT,
+  userComments TEXT,
+  order INTEGER NOT NULL,
+  gameId UUID NOT NULL,
+  userId UUID NOT NULL,
+  CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE,
+  CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
 );
 
 -- ==========================
 -- PERFORMANCE INDEXES
 -- ==========================
 
--- Index on gameId for Collections
+-- Index For Collection
 CREATE INDEX idx_collection_gameId ON collection (gameId);
-
--- Index on userId for Collections
 CREATE INDEX idx_collection_userId ON collection (userId);
+
+-- Index For Backlog
+CREATE INDEX idx_backlog_gameId ON backlog (gameId);
+CREATE INDEX idx_backlog_userId ON backlog (userId);
