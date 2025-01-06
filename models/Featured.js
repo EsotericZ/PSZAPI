@@ -11,6 +11,11 @@ Featured.init(
       primaryKey: true,
       allowNull: false,  
     },
+    description: {
+      type: DataTypes.STRING(100),
+      unique: true,
+      allowNull: false,
+    },
     order: {
       type: DataTypes.INTEGER,
       allowNull: false,

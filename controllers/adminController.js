@@ -7,7 +7,7 @@ export const getAllFeatured = async (req, res) => {
       FROM featured F
       JOIN games G ON F.gameId = G.id
     `;
-    const result = query(statement);
+    const result = await query(statement);
 
     res.status(200).send(result.rows);
   } catch (error) {

@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS games (
 -- Featured Table
 CREATE TABLE IF NOT EXISTS featured (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  description VARCHAR(100) UNIQUE NOT NULL,
   "order" INTEGER NOT NULL,
   gameId UUID NOT NULL,
   CONSTRAINT fk_game FOREIGN KEY (gameId) REFERENCES games (id) ON DELETE CASCADE
