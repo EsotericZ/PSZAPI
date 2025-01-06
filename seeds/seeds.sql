@@ -1,6 +1,7 @@
 -- Insert seed data into the users table
 INSERT INTO users (id, email, role) VALUES
-(uuid_generate_v4(), 'cjsand03z@gmail.com', 1089);
+(uuid_generate_v4(), 'cjsand03z@gmail.com', 2001),
+(uuid_generate_v4(), 'cjsand03@gmail.com', 1089);
 
 -- Insert seed data into the games table
 INSERT INTO games (id, colorDom, colorSat, esrb, gameId, image, metacritic, name, rating, ratingTop, released, slug) VALUES
