@@ -1,7 +1,11 @@
 -- Insert seed data into the users table
-INSERT INTO users (id, email, role) VALUES
-(uuid_generate_v4(), 'cjsand03z@gmail.com', 2001),
-(uuid_generate_v4(), 'cjsand03@gmail.com', 1089);
+INSERT INTO users (id, email, psn, role, verified, firstTime, createdAt) VALUES
+(uuid_generate_v4(), 'cjsand03z@gmail.com', 'Esoteric-Z', 2001, TRUE, FALSE, '2023-01-01 10:00:00'),
+(uuid_generate_v4(), 'b@gmail.com', NULL, 2001, FALSE, FALSE, '2023-02-15 14:30:00'),
+(uuid_generate_v4(), 'a@gmail.com', NULL, 2001, FALSE, FALSE, '2023-03-10 08:45:00'),
+(uuid_generate_v4(), 'z@gmail.com', 'Player1', 2001, TRUE, FALSE, '2023-04-05 18:20:00'),
+(uuid_generate_v4(), 'd@gmail.com', 'Player2', 2001, TRUE, FALSE, '2023-05-12 16:00:00'),
+(uuid_generate_v4(), 'cjsand03@gmail.com', NULL, 1089, FALSE, TRUE, '2023-06-25 09:15:00');
 
 -- Insert seed data into the games table
 INSERT INTO games (id, colorDom, colorSat, esrb, gameId, image, metacritic, name, rating, ratingTop, released, slug) VALUES

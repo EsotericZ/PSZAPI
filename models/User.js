@@ -50,12 +50,20 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    firstTime: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    announcement: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
     modelName: 'User',
     tableName: 'users',
-    timestamps: false,
+    timestamps: true,
   }
 );
 
