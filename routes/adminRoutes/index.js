@@ -6,13 +6,17 @@ import ROLES from '../../config/roles.js'
 
 import {
     getAllFeatured,
-    getAllUsers,
+    getNewUsers,
+    getVerifiedUsers,
 } from '../../controllers/adminController.js';
 
 router.route('/')
   .get(verifyRoles(ROLES.ADMIN), getAllFeatured);
 
-router.route('/users')
-  .get(verifyRoles(ROLES.ADMIN), getAllUsers);
+router.route('/newUsers')
+  .get(verifyRoles(ROLES.ADMIN), getNewUsers);
+
+router.route('/verified')
+  .get(verifyRoles(ROLES.ADMIN), getVerifiedUsers);
 
 export default router;
