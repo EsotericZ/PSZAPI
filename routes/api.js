@@ -2,11 +2,15 @@ import express from 'express';
 const router = express.Router();
 
 import adminRoutes from './adminRoutes/index.js';
-import gameRoutes from './gamesRoutes/index.js';
+import gameRoutes from './gameRoutes/index.js';
+import homeRoutes from './homeRoutes/index.js';
 import portalRoutes from './portalRoutes/index.js';
+import testRoutes from './testRoutes/index.js';
 
 router.use('/admin', adminRoutes);
 router.use('/games', gameRoutes);
+router.use('/home', homeRoutes);
 router.use('/portal', portalRoutes);
+router.use('/test', testRoutes);
 
 export default router;
