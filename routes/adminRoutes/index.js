@@ -14,9 +14,11 @@ router.route('/')
   .get(verifyRoles(ROLES.ADMIN), getAllFeatured);
 
 router.route('/newUsers')
-  .get(verifyRoles(ROLES.ADMIN), getNewUsers);
+  // .get(verifyRoles(ROLES.ADMIN), getNewUsers);
+  .get(getNewUsers);
 
 router.route('/verified')
-  .get(verifyRoles(ROLES.ADMIN), getVerifiedUsers);
+  // .get(verifyRoles(ROLES.ADMIN), getVerifiedUsers);
+  .get(getVerifiedUsers);
 
 export default router;

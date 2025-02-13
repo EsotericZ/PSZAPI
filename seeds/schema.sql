@@ -25,6 +25,17 @@ CREATE TABLE IF NOT EXISTS users (
   "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create the Friends Table
+CREATE TABLE IF NOT EXISTS friends (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  "psnAccountId" VARCHAR(255) NOT NULL,
+  "username" VARCHAR(100) NOT NULL, 
+  "avatarUrl" VARCHAR(255), 
+  "pszUser" BOOLEAN DEFAULT FALSE,
+  CONSTRAINT unique_friend UNIQUE ("userId", "psnAccountId")
+);
+
 -- Games Table
 CREATE TABLE IF NOT EXISTS games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

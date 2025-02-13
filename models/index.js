@@ -1,6 +1,7 @@
 import Backlog from './Backlog.js';
 import Collection from './Collection.js';
 import Featured from './Featured.js';
+import Friend from './Friend.js';
 import Game from './Game.js';
 import Rating from './Rating.js';
 import Review from './Review.js';
@@ -113,10 +114,23 @@ User.hasMany(Wishlist, {
   as: 'wishlists',
 });
 
+// Friends Relationships
+User.hasMany(Friend, {
+  foreignKey: "userId",
+  as: "friends",
+});
+
+Friend.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
+
+
 export {
   Backlog,
   Collection,
   Featured,
+  Friend,
   Game,
   Rating,
   Review,

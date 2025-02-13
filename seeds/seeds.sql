@@ -1,6 +1,7 @@
 -- Insert seed data into the users table
 INSERT INTO users (id, email, psn, role, verified, "verifyCode", "firstTime", "createdAt") VALUES
 (uuid_generate_v4(), 'cjsand03z@gmail.com', 'Esoteric-Z', 2001, TRUE, '15314C', FALSE, '2023-01-01 10:00:00'),
+(uuid_generate_v4(), 'cjsand03x@gmail.com', 'The_Real_Zanatos', 2001, TRUE, '153XXC', FALSE, '2023-01-01 10:00:00'),
 (uuid_generate_v4(), 'b@gmail.com', NULL, 2001, FALSE, NULL, FALSE, '2023-02-15 14:30:00'),
 (uuid_generate_v4(), 'a@gmail.com', NULL, 2001, FALSE, '5AS42X', FALSE, '2023-03-10 08:45:00'),
 (uuid_generate_v4(), 'z@gmail.com', 'Player1', 2001, TRUE, '5AS42S', FALSE, '2023-04-05 18:20:00'),
