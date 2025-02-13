@@ -5,11 +5,19 @@ import verifyRoles from '../../middleware/verifyRoles.js';
 import ROLES from '../../config/roles.js'
 
 import {
-  getPSNUserGames
+  getPSNUserData,
+  getPSNUserFriends,
+  getPSNUserGames,
 } from '../../controllers/psnController.js';
 
 router.route('/')
   .get(getPSNUserGames);
   // .get(verifyRoles(ROLES.ADMIN), getPSNUserGames);
+
+router.route('/data')
+  .get(getPSNUserData);
+
+router.route('/friends')
+  .get(getPSNUserFriends);
 
 export default router;
