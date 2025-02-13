@@ -61,7 +61,7 @@ export const getPSNUserFriends = async (req, res) => {
           return {
             accountId,
             username: profile.onlineId,
-            avatarUrl: profile.avatars?.[0]?.url || null,
+            avatarUrl: profile.avatars?.[2]?.url || null,
           };
         } catch (profileError) {
           console.error(`Error fetching profile for ${accountId}:`, profileError.message);
