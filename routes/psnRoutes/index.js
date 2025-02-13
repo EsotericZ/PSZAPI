@@ -18,6 +18,6 @@ router.route('/data')
   .get(getPSNUserData);
 
 router.route('/friends')
-  .get(getPSNUserFriends);
+  .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), getPSNUserFriends);
 
 export default router;

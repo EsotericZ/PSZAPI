@@ -10,18 +10,25 @@ const verifyRoles = (...allowedRoles) => (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Token expired' }); 
+        return res.status(401).json({ message: 'Token expired' });
       }
-      return res.status(403).json({ message: 'Invalid token' }); 
+      return res.status(403).json({ message: 'Invalid token' });
     }
 
-    if (!allowedRoles.includes(decoded.role)) {
+    if (!decoded.role) {
+      return res.status(403).json({ message: 'Access denied. No role assigned.' });
+    }
+
+    const userRoles = Array.isArray(decoded.role) ? decoded.role : [decoded.role];
+    const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
+
+    if (!hasAccess) {
       return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
     }
 
     req.user = decoded;
     next();
   });
-}
+};
 
 export default verifyRoles;

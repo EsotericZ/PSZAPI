@@ -1,12 +1,12 @@
 -- Insert seed data into the users table
-INSERT INTO users (id, email, psn, role, verified, "verifyCode", "firstTime", "createdAt") VALUES
-(uuid_generate_v4(), 'cjsand03z@gmail.com', 'Esoteric-Z', 2001, TRUE, '15314C', FALSE, '2023-01-01 10:00:00'),
-(uuid_generate_v4(), 'cjsand03x@gmail.com', 'The_Real_Zanatos', 2001, TRUE, '153XXC', FALSE, '2023-01-01 10:00:00'),
-(uuid_generate_v4(), 'b@gmail.com', NULL, 2001, FALSE, NULL, FALSE, '2023-02-15 14:30:00'),
-(uuid_generate_v4(), 'a@gmail.com', NULL, 2001, FALSE, '5AS42X', FALSE, '2023-03-10 08:45:00'),
-(uuid_generate_v4(), 'z@gmail.com', 'Player1', 2001, TRUE, '5AS42S', FALSE, '2023-04-05 18:20:00'),
-(uuid_generate_v4(), 'd@gmail.com', 'Player2', 2001, TRUE, '5AS42Y', FALSE, '2023-05-12 16:00:00'),
-(uuid_generate_v4(), 'cjsand03@gmail.com', NULL, 1089, FALSE, NULL, TRUE, '2023-06-25 09:15:00');
+INSERT INTO users (id, email, psn, role, verified, "verifyCode", "psnAvatar", "firstTime", "createdAt") VALUES
+(uuid_generate_v4(), 'cjsand03z@gmail.com', 'The_Real_Zanatos', 2001, TRUE, '15314C', 'http://static-resource.np.community.playstation.net/avatar/3RD/UP20241107S01_0627921452B0A8D30701_L.png', FALSE, '2023-01-01 10:00:00'),
+(uuid_generate_v4(), 'cjsand03x@gmail.com', 'Esoteric-Z', 2001, TRUE, '153XXC', '', FALSE, '2023-01-01 10:00:00'),
+(uuid_generate_v4(), 'b@gmail.com', NULL, 2001, FALSE, NULL, '', FALSE, '2023-02-15 14:30:00'),
+(uuid_generate_v4(), 'a@gmail.com', NULL, 2001, FALSE, '5AS42X', '', FALSE, '2023-03-10 08:45:00'),
+(uuid_generate_v4(), 'z@gmail.com', 'Player1', 2001, TRUE, '5AS42S', '', FALSE, '2023-04-05 18:20:00'),
+(uuid_generate_v4(), 'd@gmail.com', 'Player2', 2001, TRUE, '5AS42Y', '', FALSE, '2023-05-12 16:00:00'),
+(uuid_generate_v4(), 'cjsand03@gmail.com', NULL, 1089, FALSE, NULL, '', TRUE, '2023-06-25 09:15:00');
 
 -- Insert seed data into the games table
 INSERT INTO games (id, "colorDom", "colorSat", esrb, "gameId", image, metacritic, name, rating, "ratingTop", released, slug) VALUES

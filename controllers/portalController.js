@@ -29,6 +29,9 @@ export const loginUser = async (req, res) => {
       id: user.id,
       email: user.email,
       role: user.role || 2001,
+      psn: user.psn,
+      verified: user.verified,
+      psnAvatar: user.psnAvatar,
     };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -65,6 +68,9 @@ export const refreshToken = (req, res) => {
         id: payload.id, 
         email: payload.email, 
         role: payload.role,
+        psn: payload.psn,
+        verified: payload.verified,
+        psnAvatar: payload.psnAvatar,
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }

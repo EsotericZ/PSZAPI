@@ -60,7 +60,6 @@ export const getPSNUserFriends = async (req, res) => {
 
     // const userPsn = userResult.rows[0].psn;
     const userId = userResult.rows[0].id;
-    console.log(userId)
 
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
