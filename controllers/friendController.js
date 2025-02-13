@@ -12,6 +12,9 @@ export const getAllUserFriends = async (req, res) => {
       LEFT JOIN users U 
       ON F."username" = U."psn"
       WHERE F."userId" = $1
+      ORDER BY 
+        U.id IS NULL,
+        F."username" ASC
     `;
     const result = await query(statement, [userId]);
 
