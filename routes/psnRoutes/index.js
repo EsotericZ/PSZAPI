@@ -8,7 +8,6 @@ import {
   getPSNUserData,
   getPSNUserFriends,
   getPSNUserGames,
-  getPSNUserGamesAndTrophies,
 } from '../../controllers/psnController.js';
 
 router.route('/')
@@ -20,8 +19,5 @@ router.route('/data')
 
 router.route('/friends')
   .get(getPSNUserFriends);
-
-router.route('/test')
-  .get(getPSNUserGamesAndTrophies);
 
 export default router;
