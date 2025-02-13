@@ -6,6 +6,8 @@ import {
   getUserFriendsAccountIds,
   getUserTitles,
   makeUniversalSearch,
+  getUserTrophiesEarnedForTitle,
+  getTitleTrophies,
 } from "psn-api";
 
 export const getPSNUserData = async (req, res) => {
@@ -117,7 +119,89 @@ export const getPSNUserGames = async (req, res) => {
   }
 }
 
+export const getPSNUserGamesAndTrophies = async (req, res) => {
+  // const psn = req.body.psn;
+  const psn = 'The_Real_Zanatos';
+  const NPSSO = process.env.NPSSO;
+
+  if (!NPSSO) {
+      return res.status(500).json({ error: "NPSSO token is missing in environment variables." });
+  }
+
+  try {
+      const accessCode = await exchangeNpssoForCode(NPSSO);
+      const authorization = await exchangeCodeForAccessToken(accessCode);
+
+      const allAccountsSearchResults = await makeUniversalSearch(
+          authorization,
+          psn,
+          "SocialAllAccounts"
+      );
+
+      if (
+          !allAccountsSearchResults.domainResponses ||
+          !allAccountsSearchResults.domainResponses.length ||
+          !allAccountsSearchResults.domainResponses[0].results ||
+          !allAccountsSearchResults.domainResponses[0].results.length
+      ) {
+          return res.status(404).json({ error: "User not found or no PSN account linked." });
+      }
+
+      const targetAccountId = allAccountsSearchResults.domainResponses[0].results[0].socialMetadata.accountId;
+      const { trophyTitles } = await getUserTitles(authorization, targetAccountId, { limit: 800 });
+      const userPS5Games = trophyTitles.filter(game => game.trophyTitlePlatform?.toUpperCase() === "PS5");
+
+      const gamesWithTrophies = await Promise.all(userPS5Games.map(async (game) => {
+        try {
+            const titleTrophies = await getTitleTrophies(
+                authorization,
+                game.npCommunicationId,
+                "all"
+            );
+    
+            const userTrophyData = await getUserTrophiesEarnedForTitle(
+                authorization,
+                targetAccountId,
+                game.npCommunicationId,
+                "all"
+            );
+    
+            const earnedTrophyMap = new Map(
+                userTrophyData.trophies.map(trophy => [trophy.trophyId, trophy.earned])
+            );
+    
+            const trophies = titleTrophies.trophies.map(trophy => ({
+                id: trophy.trophyId,
+                name: trophy.trophyName || "Unknown Trophy",
+                image: trophy.trophyIconUrl || null,
+                type: trophy.trophyType, 
+                hidden: trophy.trophyHidden,
+                earned: earnedTrophyMap.get(trophy.trophyId) || false,
+                rarity: trophy.trophyEarnedRate
+            }));
+    
+            return {
+                gameId: game.npCommunicationId,
+                name: game.trophyTitleName,
+                platform: game.trophyTitlePlatform,
+                trophies
+            };
+        } catch (err) {
+            console.error(`Failed to fetch trophies for ${game.trophyTitleName}:`, err);
+            return { gameId: game.npCommunicationId, name: game.trophyTitleName, error: err.message };
+        }
+      }));
+
+      res.json(gamesWithTrophies);
+  } catch (error) {
+      console.error("Error in getPSNUserGamesAndTrophies:", error);
+      res.status(500).json({ error: "An error occurred while fetching user games and trophies.", details: error.message });
+  }
+};
+
+
 export const psnController = {
+  getPSNUserGamesAndTrophies,
   getPSNUserData,
   getPSNUserFriends,
   getPSNUserGames,
