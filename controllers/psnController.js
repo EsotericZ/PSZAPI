@@ -12,20 +12,32 @@ import {
 import query from '../db/index.js';
 
 export const getPSNUserData = async (req, res) => {
-  // const psn = req.body.psn;
-  const psn = 'The_Real_Zanatos'
+  const userId = req.params.id;
   const NPSSO = process.env.NPSSO
+  console.log(userId)
 
   if (!NPSSO) {
     return res.status(500).json({ error: "NPSSO token is missing in environment variables." });
   }
 
   try {
+    const userCheckQuery = `
+      SELECT psn 
+      FROM users 
+      WHERE id = $1
+    `;
+    const userResult = await query(userCheckQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
     const response = await getProfileFromUserName(
       authorization,
-      psn
+      userPsn
     )
 
     res.json(response)
@@ -36,8 +48,7 @@ export const getPSNUserData = async (req, res) => {
 }
 
 export const getPSNUserFriends = async (req, res) => {
-  // const { userId } = req.params;
-  const userPsn = 'The_Real_Zanatos';
+  const userId = req.params.id;
   const NPSSO = process.env.NPSSO;
 
   if (!NPSSO) {
@@ -45,22 +56,18 @@ export const getPSNUserFriends = async (req, res) => {
   }
 
   try {
-    // const userCheckQuery = `SELECT psn FROM users WHERE id = $1`;
-    // const userResult = await query(userCheckQuery, [userId]);
     const userCheckQuery = `
-      SELECT id 
+      SELECT psn 
       FROM users 
-      WHERE psn = $1
+      WHERE id = $1
     `;
-    const userResult = await query(userCheckQuery, [userPsn]);
+    const userResult = await query(userCheckQuery, [userId]);
 
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // const userPsn = userResult.rows[0].psn;
-    const userId = userResult.rows[0].id;
-
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
 
@@ -154,8 +161,7 @@ export const getPSNUserFriends = async (req, res) => {
 };
 
 export const getPSNUserGames = async (req, res) => {
-  // const psn = req.body.psn;
-  const psn = 'The_Real_Zanatos';
+  const userId = req.params.id;
   const NPSSO = process.env.NPSSO;
 
   if (!NPSSO) {
@@ -163,12 +169,24 @@ export const getPSNUserGames = async (req, res) => {
   }
 
   try {
+    const userCheckQuery = `
+      SELECT psn 
+      FROM users 
+      WHERE id = $1
+    `;
+    const userResult = await query(userCheckQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
 
     const allAccountsSearchResults = await makeUniversalSearch(
       authorization,
-      psn,
+      userPsn,
       "SocialAllAccounts"
     );
 
@@ -185,56 +203,123 @@ export const getPSNUserGames = async (req, res) => {
     const { trophyTitles } = await getUserTitles(authorization, targetAccountId, { limit: 800 });
 
     const userPS5Games = trophyTitles.filter(game => game.trophyTitlePlatform?.toUpperCase() === "PS5" && !game.hiddenFlag);
-    const gamesWithTrophies = await Promise.all(userPS5Games.map(async (game) => {
-      try {
-        const titleTrophies = await getTitleTrophies(
-          authorization,
-          game.npCommunicationId,
-          "all"
-        );
 
-        const userTrophyData = await getUserTrophiesEarnedForTitle(
-          authorization,
-          targetAccountId,
-          game.npCommunicationId,
-          "all"
-        );
+    const insertValues = [];
+    const updateValues = [];
 
-        const earnedTrophyMap = new Map(
-          userTrophyData.trophies.map(trophy => [trophy.trophyId, trophy.earned])
-        );
+    const gamesWithTrophies = await Promise.all(
+      userPS5Games.map(async (game) => {
+        try {
+          const titleTrophies = await getTitleTrophies(
+            authorization,
+            game.npCommunicationId,
+            "all"
+          );
 
-        const trophies = titleTrophies.trophies
-          .filter(trophy => !trophy.trophyHidden)
-          .map(trophy => ({
-            id: trophy.trophyId,
-            name: trophy.trophyName || "Unknown Trophy",
-            image: trophy.trophyIconUrl || null,
-            type: trophy.trophyType,
-            earned: earnedTrophyMap.get(trophy.trophyId) || false,
-            rarity: trophy.trophyEarnedRate
-          }));
+          const userTrophyData = await getUserTrophiesEarnedForTitle(
+            authorization,
+            targetAccountId,
+            game.npCommunicationId,
+            "all"
+          );
 
-        return {
-          gameId: game.npCommunicationId,
-          name: game.trophyTitleName,
-          image: game.trophyTitleIconUrl,
-          progress: game.progress,
-          earnedTrophies: game.earnedTrophies,
-          trophies
-        };
-      } catch (err) {
-        console.error(`Failed to fetch trophies for ${game.trophyTitleName}:`, err);
-        return {
-          gameId: game.npCommunicationId,
-          name: game.trophyTitleName,
-          image: game.trophyTitleIconUrl,
-          progress: game.progress,
-          earnedTrophies: game.earnedTrophies,
-          error: err.message
-        };
+          const earnedTrophyMap = new Map(
+            userTrophyData.trophies.map(trophy => [trophy.trophyId, trophy.earned])
+          );
+
+          const trophies = titleTrophies.trophies
+            .filter(trophy => !trophy.trophyHidden)
+            .map(trophy => ({
+              id: trophy.trophyId,
+              name: trophy.trophyName || "Unknown Trophy",
+              image: trophy.trophyIconUrl || null,
+              type: trophy.trophyType,
+              earned: earnedTrophyMap.get(trophy.trophyId) || false,
+              rarity: trophy.trophyEarnedRate
+            }));
+
+            const earnedTrophies = {
+              bronze: userTrophyData.earnedTrophies?.bronze || 0,
+              silver: userTrophyData.earnedTrophies?.silver || 0,
+              gold: userTrophyData.earnedTrophies?.gold || 0,
+              platinum: userTrophyData.earnedTrophies?.platinum || 0,
+            };
+  
+            // Determine if platinum is earned
+            const platinum = earnedTrophies.platinum > 0;
+
+            const escapeSQL = (str) => {
+              if (!str) return "";
+              return str.replace(/'/g, "''"); // Escapes single quotes for SQL
+            };
+            
+  
+            // Store values for bulk insert
+            insertValues.push(
+              `('${userId}', '${game.npCommunicationId}', '${escapeSQL(game.trophyTitleName)}', 
+              '${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
+              '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
+              '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 'active')`
+            );
+  
+            // Store values for bulk update
+            updateValues.push(
+              `('${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
+              '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
+              '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 
+              '${escapeSQL(game.trophyTitleName)}', '${userId}', '${game.npCommunicationId}')`
+            );
+
+          return {
+            gameId: game.npCommunicationId,
+            name: game.trophyTitleName,
+            image: game.trophyTitleIconUrl,
+            progress: game.progress,
+            earnedTrophies: game.earnedTrophies,
+            platinum,
+            trophies,
+          };
+        } catch (err) {
+          console.error(`Failed to fetch trophies for ${game.trophyTitleName}:`, err);
+          return {
+            gameId: game.npCommunicationId,
+            name: game.trophyTitleName,
+            image: game.trophyTitleIconUrl,
+            progress: game.progress,
+            earnedTrophies: game.earnedTrophies,
+            platinum: false,
+            error: err.message,
+          };
+        }
       }
-    }));
+    ));
+
+    if (insertValues.length > 0) {
+      const insertQuery = `
+        INSERT INTO collection (
+          "userId", 
+          "gameId", 
+          "name", 
+          "image", 
+          "progress", 
+          "platinum", 
+          "earnedTrophies", 
+          "trophies", 
+          "status"
+        )
+        VALUES ${insertValues.join(", ")}
+        ON CONFLICT ("userId", "gameId") 
+        DO UPDATE SET 
+          "image" = EXCLUDED."image",
+          "progress" = EXCLUDED."progress",
+          "platinum" = EXCLUDED."platinum",
+          "earnedTrophies" = EXCLUDED."earnedTrophies",
+          "trophies" = EXCLUDED."trophies",
+          "name" = EXCLUDED."name"
+      `;
+
+      await query(insertQuery);
+    }
 
     res.json(gamesWithTrophies);
   } catch (error) {

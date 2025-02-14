@@ -11,11 +11,16 @@ Collection.init(
       primaryKey: true,
       allowNull: false,
     },
-    psnName: {
+    gameId: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: "collection_user_game_unique",
+    },
+    name: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    psnIcon: {
+    image: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
@@ -27,17 +32,19 @@ Collection.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    earnedTrophies: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: {},
+    },
+    trophies: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
     status: {
       type: DataTypes.STRING(20),
       allowNull: false,
-    },
-    gameId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: 'games',
-        key: 'id',
-      },
     },
     userId: {
       type: DataTypes.UUID,
@@ -46,6 +53,7 @@ Collection.init(
         model: 'users',
         key: 'id',
       },
+      unique: "collection_user_game_unique",
     },
   },
   {
@@ -53,6 +61,12 @@ Collection.init(
     modelName: 'Collection',
     tableName: 'collection',
     timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ["userId", "gameId"], // Creates composite unique constraint
+      },
+    ],
   }
 );
 

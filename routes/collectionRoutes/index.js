@@ -5,10 +5,11 @@ import verifyRoles from '../../middleware/verifyRoles.js';
 import ROLES from '../../config/roles.js'
 
 import {
-  getAllUserFriends
-} from '../../controllers/friendController.js';
+  getAllUserCollection
+} from '../../controllers/collectionController.js';
 
 router.route('/:id')
-  .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), getAllUserFriends);
+  // .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), getAllUserFriends);
+  .get(getAllUserCollection);
 
 export default router;

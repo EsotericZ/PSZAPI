@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS users (
   "psnPlus" BOOLEAN DEFAULT FALSE,
   "firstTime" BOOLEAN DEFAULT TRUE,
   announcement BOOLEAN DEFAULT FALSE,
+  "accountLevel" VARCHAR(10) CHECK ("accountLevel" IN ('standard', 'premium')) DEFAULT 'standard',
+  "lastApiRequestStandard" TIMESTAMP WITH TIME ZONE,
+  "lastApiRequestPremium" TIMESTAMP WITH TIME ZONE,
   "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -86,15 +89,17 @@ CREATE TABLE IF NOT EXISTS reviews (
 -- Collection Table
 CREATE TABLE IF NOT EXISTS collection (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "psnName" VARCHAR(100) NOT NULL,
-  "psnIcon" VARCHAR(255) NOT NULL,
+  "gameId" VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  image VARCHAR(255) NOT NULL,
   progress INTEGER NOT NULL,
   platinum BOOLEAN DEFAULT FALSE,
+  "earnedTrophies" JSONB NOT NULL DEFAULT '{}'::JSONB,
+  trophies JSONB NOT NULL DEFAULT '[]'::JSONB,
   status VARCHAR(20) NOT NULL,
-  "gameId" UUID NOT NULL,
   "userId" UUID NOT NULL,
-  CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES games (id) ON DELETE CASCADE,
-  CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE
+  CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE,
+  CONSTRAINT collection_user_game_unique UNIQUE ("userId", "gameId")
 );
 
 -- Backlog Table

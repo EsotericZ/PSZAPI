@@ -58,6 +58,19 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    accountLevel: {
+      type: DataTypes.ENUM('standard', 'premium'),
+      defaultValue: 'standard',
+      allowNull: false,
+    },
+    lastApiRequestStandard: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    lastApiRequestPremium: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,

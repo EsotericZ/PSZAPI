@@ -52,19 +52,9 @@ Game.hasMany(Review, {
 });
 
 // Collection Relationships
-Collection.belongsTo(Game, {
-  foreignKey: 'gameId',
-  as: 'game',
-});
-
 Collection.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',
-});
-
-Game.hasMany(Collection, {
-  foreignKey: 'gameId',
-  as: 'collections',
 });
 
 User.hasMany(Collection, {

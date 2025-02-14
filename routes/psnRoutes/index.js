@@ -10,14 +10,15 @@ import {
   getPSNUserGames,
 } from '../../controllers/psnController.js';
 
-router.route('/')
+router.route('/:id')
+  // .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), updateUserPSN);
   .get(getPSNUserGames);
-  // .get(verifyRoles(ROLES.ADMIN), getPSNUserGames);
 
-router.route('/data')
+router.route('/data/:id')
   .get(getPSNUserData);
 
-router.route('/friends')
-  .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), getPSNUserFriends);
+router.route('/friends/:id')
+  // .get(verifyRoles(ROLES.ADMIN, ROLES.BLOGGER, ROLES.PLAYER), getPSNUserFriends);
+  .get(getPSNUserFriends);
 
 export default router;
