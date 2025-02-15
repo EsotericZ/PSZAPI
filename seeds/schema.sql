@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   "psnAccountId" VARCHAR(255),
   "psnAvatar" VARCHAR(255),
   "psnPlus" BOOLEAN DEFAULT FALSE,
+  trophies JSONB NOT NULL DEFAULT '{}'::JSONB,
   "firstTime" BOOLEAN DEFAULT TRUE,
   announcement BOOLEAN DEFAULT FALSE,
   "accountLevel" VARCHAR(10) CHECK ("accountLevel" IN ('standard', 'premium')) DEFAULT 'standard',

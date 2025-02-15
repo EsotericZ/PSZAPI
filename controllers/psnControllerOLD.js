@@ -11,29 +11,53 @@ import {
 } from "psn-api";
 import query from '../db/index.js';
 
-export const getPSNUserData = async (userId, userPsn, NPSSO) => {
+export const getPSNUserData = async (req, res) => {
+  const userId = req.params.id;
+  const NPSSO = process.env.NPSSO
+  console.log(userId)
+
+  if (!NPSSO) {
+    return res.status(500).json({ error: "NPSSO token is missing in environment variables." });
+  }
+
   try {
+    const userCheckQuery = `
+      SELECT psn 
+      FROM users 
+      WHERE id = $1
+    `;
+    const userResult = await query(userCheckQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
-    const response = await getProfileFromUserName(authorization, userPsn);
+    const response = await getProfileFromUserName(
+      authorization,
+      userPsn
+    )
 
     if (!response.profile) {
-      throw new Error('No profile data found.');
+      return res.status(404).json({ error: "No profile data found." });
     }
 
     const updatedPsnAvatar = response.profile.avatarUrls?.find(url => url.size === "l")?.avatarUrl || null;
     const updatedTrophies = response.profile.trophySummary;
-    const updatedPsnPlus = response.profile.plus === 1;
+    const updatedPsnPlus = response.profile.plus === 1; 
 
     const updateQuery = `
       UPDATE users 
       SET 
-        "psnAvatar" = $2,
-        trophies = $3, 
-        "psnPlus" = $4
+          "psnAvatar" = $2,
+          trophies = $3, 
+          "psnPlus" = $4
       WHERE id = $1
     `;
 
+    // Execute Query
     await query(updateQuery, [
       userId,
       updatedPsnAvatar,
@@ -41,15 +65,34 @@ export const getPSNUserData = async (userId, userPsn, NPSSO) => {
       updatedPsnPlus,
     ]);
 
-    return { message: 'User Data Updated Successfully!', profile: response.profile };
+    res.json({ message: "User data updated successfully!", profile: response.profile });
   } catch (error) {
-    console.error('Error in getPSNUserData:', error);
-    throw new Error('Failed to Fetch and Update PSN User Data.');
+    console.error("Error in getPSNUserGames:", error);
+    res.status(500).json({ error: "An error occurred while fetching user games.", details: error.message });
   }
 }
 
-export const getPSNUserFriends = async (userId, userPsn, NPSSO) => {
+export const getPSNUserFriends = async (req, res) => {
+  const userId = req.params.id;
+  const NPSSO = process.env.NPSSO;
+
+  if (!NPSSO) {
+    return res.status(500).json({ error: "NPSSO token is missing in environment variables." });
+  }
+
   try {
+    const userCheckQuery = `
+      SELECT psn 
+      FROM users 
+      WHERE id = $1
+    `;
+    const userResult = await query(userCheckQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
 
@@ -73,7 +116,7 @@ export const getPSNUserFriends = async (userId, userPsn, NPSSO) => {
           };
         } catch (profileError) {
           console.error(`Error fetching profile for ${accountId}:`, profileError.message);
-          return { psnAccountId: accountId, username: 'Error Fetching', avatarUrl: null };
+          return { psnAccountId: accountId, username: "Error Fetching", avatarUrl: null };
         }
       })
     );
@@ -135,15 +178,34 @@ export const getPSNUserFriends = async (userId, userPsn, NPSSO) => {
     `;
     const savedFriendsResult = await query(fetchFriendsQuery, [userId]);
 
-    return savedFriendsResult.rows;
+    res.json({ message: "Friends fetched and saved!", friends: savedFriendsResult.rows });
   } catch (error) {
-    console.error('Error in getPSNUserFriends:', error);
-    throw new Error('Failed to fetch PSN User Friends.');
+    console.error("Error in getPSNUserFriends:", error);
+    res.status(500).json({ error: "An error occurred while fetching user friends.", details: error.message });
   }
 };
 
-export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
+export const getPSNUserGames = async (req, res) => {
+  const userId = req.params.id;
+  const NPSSO = process.env.NPSSO;
+
+  if (!NPSSO) {
+    return res.status(500).json({ error: "NPSSO token is missing in environment variables." });
+  }
+
   try {
+    const userCheckQuery = `
+      SELECT psn 
+      FROM users 
+      WHERE id = $1
+    `;
+    const userResult = await query(userCheckQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userPsn = userResult.rows[0].psn;
     const accessCode = await exchangeNpssoForCode(NPSSO);
     const authorization = await exchangeCodeForAccessToken(accessCode);
 
@@ -159,13 +221,14 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
       !allAccountsSearchResults.domainResponses[0].results ||
       !allAccountsSearchResults.domainResponses[0].results.length
     ) {
-      return res.status(404).json({ error: 'User not found or no PSN account linked.' });
+      return res.status(404).json({ error: "User not found or no PSN account linked." });
     }
 
     const targetAccountId = allAccountsSearchResults.domainResponses[0].results[0].socialMetadata.accountId;
     const { trophyTitles } = await getUserTitles(authorization, targetAccountId, { limit: 800 });
 
     const userPS5Games = trophyTitles.filter(game => game.trophyTitlePlatform?.toUpperCase() === "PS5" && !game.hiddenFlag);
+
     const insertValues = [];
     const updateValues = [];
 
@@ -200,39 +263,44 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
               rarity: trophy.trophyEarnedRate
             }));
 
-          const earnedTrophies = {
-            bronze: userTrophyData.earnedTrophies?.bronze || 0,
-            silver: userTrophyData.earnedTrophies?.silver || 0,
-            gold: userTrophyData.earnedTrophies?.gold || 0,
-            platinum: userTrophyData.earnedTrophies?.platinum || 0,
-          };
+            const earnedTrophies = {
+              bronze: userTrophyData.earnedTrophies?.bronze || 0,
+              silver: userTrophyData.earnedTrophies?.silver || 0,
+              gold: userTrophyData.earnedTrophies?.gold || 0,
+              platinum: userTrophyData.earnedTrophies?.platinum || 0,
+            };
+  
+            // Determine if platinum is earned
+            const platinum = earnedTrophies.platinum > 0;
 
-          const platinum = earnedTrophies.platinum > 0;
-          const escapeSQL = (str) => {
-            if (!str) return "";
-            return str.replace(/'/g, "''");
-          };
-
-          insertValues.push(
-            `('${userId}', '${game.npCommunicationId}', '${escapeSQL(game.trophyTitleName)}', 
-            '${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
-            '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
-            '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 'active')`
-          );
-
-          updateValues.push(
-            `('${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
-            '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
-            '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 
-            '${escapeSQL(game.trophyTitleName)}', '${userId}', '${game.npCommunicationId}')`
-          );
+            const escapeSQL = (str) => {
+              if (!str) return "";
+              return str.replace(/'/g, "''"); // Escapes single quotes for SQL
+            };
+            
+  
+            // Store values for bulk insert
+            insertValues.push(
+              `('${userId}', '${game.npCommunicationId}', '${escapeSQL(game.trophyTitleName)}', 
+              '${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
+              '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
+              '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 'active')`
+            );
+  
+            // Store values for bulk update
+            updateValues.push(
+              `('${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
+              '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
+              '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 
+              '${escapeSQL(game.trophyTitleName)}', '${userId}', '${game.npCommunicationId}')`
+            );
 
           return {
             gameId: game.npCommunicationId,
             name: game.trophyTitleName,
             image: game.trophyTitleIconUrl,
             progress: game.progress,
-            earnedTrophies,
+            earnedTrophies: game.earnedTrophies,
             platinum,
             trophies,
           };
@@ -243,13 +311,13 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             name: game.trophyTitleName,
             image: game.trophyTitleIconUrl,
             progress: game.progress,
-            earnedTrophies,
+            earnedTrophies: game.earnedTrophies,
             platinum: false,
             error: err.message,
           };
         }
-      })
-    );
+      }
+    ));
 
     if (insertValues.length > 0) {
       const insertQuery = `
@@ -278,10 +346,10 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
       await query(insertQuery);
     }
 
-    return gamesWithTrophies;
+    res.json(gamesWithTrophies);
   } catch (error) {
-    console.error('Error in getPSNUserGames:', error);
-    throw new Error('An error occurred while fetching user games and trophies.');
+    console.error("Error in getPSNUserGamesAndTrophies:", error);
+    res.status(500).json({ error: "An error occurred while fetching user games and trophies.", details: error.message });
   }
 };
 

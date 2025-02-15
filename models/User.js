@@ -50,6 +50,11 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    trophies: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: {},
+    },
     firstTime: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

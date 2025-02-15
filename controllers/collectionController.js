@@ -2,7 +2,6 @@ import query from '../db/index.js';
 
 export const getAllUserCollection = async (req, res) => {
   const userId = req.params.id;
-  console.log(userId)
 
   try {
     const statement = `
