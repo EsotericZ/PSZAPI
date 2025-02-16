@@ -28,10 +28,12 @@ export const loginUser = async (req, res) => {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role || 2001,
       psn: user.psn,
+      role: user.role || 2001,
       verified: user.verified,
       psnAvatar: user.psnAvatar,
+      psnPlus: user.psnPlus,
+      accountLevel: user.accountLevel,
     };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -67,10 +69,12 @@ export const refreshToken = (req, res) => {
       { 
         id: payload.id, 
         email: payload.email, 
-        role: payload.role,
         psn: payload.psn,
+        role: payload.role,
         verified: payload.verified,
         psnAvatar: payload.psnAvatar,
+        psnPlus: payload.psnPlus,
+        accountLevel: payload.accountLevel,
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
