@@ -37,9 +37,14 @@ export const updateUserPSN = async (req, res) => {
     let cooldown = accountLevel === "premium" ? 60 * 1000 : 24 * 60 * 60 * 1000;
 
     if (lastRequestTime && now - new Date(lastRequestTime) < cooldown) {
-      return res.status(429).json({ error: 'Cooldown period has not elapsed.' });
+      const timeRemaining = cooldown - (now - lastRequestTime);
+      return res.status(200).json({ 
+        success: false, 
+        message: 'Cooldown Period Has Not Elapsed.',
+        timeRemaining
+      });
     }
-
+    
     const [userData, userFriends, userGames] = await Promise.all([
       getPSNUserData(userId, userPsn, NPSSO),
       getPSNUserFriends(userId, userPsn, NPSSO),

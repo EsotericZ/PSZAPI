@@ -200,12 +200,15 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
               rarity: trophy.trophyEarnedRate
             }));
 
-          const earnedTrophies = {
-            bronze: userTrophyData.earnedTrophies?.bronze || 0,
-            silver: userTrophyData.earnedTrophies?.silver || 0,
-            gold: userTrophyData.earnedTrophies?.gold || 0,
-            platinum: userTrophyData.earnedTrophies?.platinum || 0,
-          };
+          const earnedTrophies = userTrophyData.trophies.reduce(
+            (acc, trophy) => {
+              if (trophy.earned) {
+                acc[trophy.trophyType]++;
+              }
+              return acc;
+            },
+            { bronze: 0, silver: 0, gold: 0, platinum: 0 }
+          );
 
           const platinum = earnedTrophies.platinum > 0;
           const escapeSQL = (str) => {
