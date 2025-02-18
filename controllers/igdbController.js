@@ -1,7 +1,10 @@
 const clientId = process.env.TWITCH_ID;
 const accessToken = process.env.TWITCH_ACCESS_TOKEN;
 
-export const test = async (req, res) => {
+export const searchGames = async (req, res) => {
+  const { game } = req.body;
+  console.log(game)
+
   try {
     const response = await fetch(
       "https://api.igdb.com/v4/games",
@@ -14,6 +17,7 @@ export const test = async (req, res) => {
         },
         body: `
           fields 
+            name,
             age_ratings,
             aggregated_rating, 
             artworks.image_id,
@@ -29,7 +33,7 @@ export const test = async (req, res) => {
             storyline,
             summary,
             videos;
-          where (platforms=[167] & version_parent = null & category=0 & name ~ *"god of"*);
+          where (platforms=[167] & version_parent = null & category=0 & name ~ *"${game}"*);
           limit 50;
           `
         }
@@ -93,5 +97,5 @@ export const search = async (req, res) => {
 
 
 export const testController = {
-  test
+  searchGames
 }
