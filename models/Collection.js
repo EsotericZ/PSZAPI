@@ -64,7 +64,7 @@ Collection.init(
     indexes: [
       {
         unique: true,
-        fields: ["userId", "gameId"], // Creates composite unique constraint
+        fields: ["userId", "gameId"],
       },
     ],
   }

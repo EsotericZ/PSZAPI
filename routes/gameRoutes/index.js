@@ -9,6 +9,7 @@ import {
 } from '../../controllers/gameController.js';
 
 router.route('/')
-  .get(verifyRoles(ROLES.ADMIN), getAllGames);
+  // .get(verifyRoles(ROLES.ADMIN), getAllGames);
+  .get(getAllGames);
 
 export default router;
