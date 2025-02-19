@@ -11,48 +11,45 @@ IGDB.init(
       primaryKey: true,
       allowNull: false,
     },
-    colorDom: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    colorSat: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    esrb: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
-    gameId: {
+    gameId: { 
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: true,
     },
-    image: {
+    name: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    metacritic: {
+    cover: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+    esrb: { 
+      type: DataTypes.STRING(50),
+      allowNull: true,
     },
     rating: {
       type: DataTypes.FLOAT,
       allowNull: true,
     },
-    ratingTop: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    released: {
+    released: { 
       type: DataTypes.STRING(10),
-      allowNull: false,
+      allowNull: true,
     },
     slug: {
       type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    genres: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    storyline: { 
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    summary: { 
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   },

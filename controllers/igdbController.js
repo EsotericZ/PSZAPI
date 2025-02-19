@@ -20,6 +20,21 @@ export const getAllGames = async (req, res) => {
 
 export const searchGames = async (req, res) => {
   const { game } = req.body;
+  const esrbRatings = {
+    6: "RP (Rating Pending)",
+    7: "EC (Early Childhood)",
+    8: "E (Everyone)",
+    9: "E10+ (Everyone 10+)",
+    10: "T (Teen)",
+    11: "M (Mature 17+)",
+    12: "AO (Adults Only)",
+  };
+  
+  const getEsrbRating = (ageRatings) => {
+    if (!ageRatings) return "Not Rated";
+    const esrb = ageRatings.find(({ category }) => category === 1);
+    return esrb ? esrbRatings[esrb.rating] || `Code ${esrb.rating}` : "Not Rated";
+  };
 
   try {
     const response = await fetch(
@@ -34,7 +49,8 @@ export const searchGames = async (req, res) => {
         body: `
           fields 
             name,
-            age_ratings,
+            age_ratings.rating,
+            age_ratings.category,
             aggregated_rating, 
             artworks.image_id,
             category,
@@ -75,8 +91,23 @@ export const searchGames = async (req, res) => {
     }
 
     const data = await response.json();
+    
+    const games = data.map(game => ({
+      gameId: game.id,
+      name: game.name,
+      cover: game.cover.image_id || null,
+      esrb: getEsrbRating(game.age_ratings),
+      rating: game.aggregated_rating || 'No Rating',
+      releaseDate: game.first_release_date 
+        ? new Date(game.first_release_date * 1000).toISOString().split("T")[0]  // YYYY-MM-DD
+        : 'Unknown',
+      slug: game.slug,
+      genres: game.genres || [],
+      storyline: game.storyline || '',
+      summary: game.summary || '',
+    }));
 
-    res.status(200).send(data);
+    res.status(200).send(games);
   } catch (err) {
     console.error('Error fetching data from IGDB:', err);
     res.status(500).send({ error: 'An error occurred while fetching data from IGDB' });

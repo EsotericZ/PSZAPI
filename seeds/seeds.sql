@@ -9,15 +9,21 @@ INSERT INTO users (id, email, psn, role, verified, "verifyCode", "firstTime", "c
 (uuid_generate_v4(), 'cjsand03@gmail.com', NULL, 1089, FALSE, NULL, TRUE, '2023-06-25 09:15:00');
 
 -- Insert seed data into the games table
-INSERT INTO igdb (id, "colorDom", "colorSat", esrb, "gameId", image, metacritic, name, rating, "ratingTop", released, slug) VALUES
-(uuid_generate_v4(), '0f0f0f', '0f0f0f', 'No Rating', 973384, 'https://media.rawg.io/media/screenshots/1d3/1d37ed8c21e856d71c06874c17916981.jpg', 0, 'God of War Ragnarok: Valhalla', 4.26, 5, '2023-12-12', 'god-of-war-ragnarok-valhalla'),
-(uuid_generate_v4(), '0f0f0f', '0f0f0f', 'No Rating', 842402, 'https://media.rawg.io/media/games/c2c/c2c9f1c026b6c1be5bc2160baf7224ea.jpg', 0, 'Dredge', 4.33, 5, '2023-03-29', 'dredge'),
-(uuid_generate_v4(), '0f0f0f', '0f0f0f', 'Mature', 58755, 'https://media.rawg.io/media/games/9fb/9fbf956a16249def7625ab5dc3d09515.jpg', 88, 'Devil May Cry 5', 4.25, 5, '2019-03-08', 'devil-may-cry-5'),
-(uuid_generate_v4(), '0f0f0f', '0f0f0f', 'No Rating', 638654, 'https://media.rawg.io/media/games/ea6/ea6a1382b15d749e15fdfbf0aece7689.jpg', 0, 'Dead Space', 4.41, 5, '2023-01-27', 'dead-space-5');
+INSERT INTO igdb (id, cover, esrb, "gameId", name, rating, "releaseDate", slug, genres, storyline, summary) VALUES
+(
+  uuid_generate_v4(), 
+  'co5s5v', 
+  'M (Mature 17+)', 
+  112875, 
+  'God of War Ragnarök', 
+  94.61538461538461, 
+  '2022-11-09', 
+  'god-of-war-ragnarok', 
+  '[{"id": 12, "name": "Role-playing (RPG)"}, {"id": 25, "name": "Hack and slash/Beat ''em up"}, {"id": 31, "name": "Adventure"}]'::jsonb, 
+  'The freezing winds of Fimbulwinter have come to Midgard, making survival for Kratos, Atreus, and Mimir in the Norse wilds even more challenging than before.\n\nWhile the last game built an enormous amount of trust and understanding between father and son, there is still a great deal of complexity in their interactions – especially after the revelation of Atreus’ Giant heritage and the hidden prophecy only Kratos saw.\n\nAtreus is desperately curious. Like most young people, he wants to understand who he is more than anything. In this case, he wants to understand who he could be. The mystery of Loki’s role in the upcoming conflict is something that Atreus cannot let go of. He wants to keep his family safe, but Atreus also doesn’t want to stand by and do nothing while conflict consumes the Nine Realms.\n\nKratos, still bearing the knowledge of his past mistakes, wants to spare Atreus the bloody lessons he learned from his conflict with gods. He wants to keep his son safe, above all, and their confrontation with Baldur has vindicated the belief that only tragedy will come from further entanglements with the Aesir.\n\nTogether, Kratos and Atreus will have to make a choice about which path they will take. Whatever they choose will define the fate of all those living in the Nine Realms as Ragnarök approaches.', 
+  'God of War: Ragnarök is the ninth installment in the God of War series and the sequel to 2018s God of War. Continuing with the Norse mythology theme, the game is set in ancient Norway and features series protagonists Kratos, the former Greek God of War, and his young son Atreus. The game kicked off the events of Ragnarök, where Kratos and Atreus must journey to each of the Nine Realms in search of answers as they prepare for the prophesied battle that will end the world.'
+);
 
 -- Insert seed data into the games table
 INSERT INTO featured (id, description, "order", "gameId") VALUES
-(uuid_generate_v4(), 'Game of the Month', 1, (SELECT id FROM igdb WHERE slug='dead-space-5')),
-(uuid_generate_v4(), 'Featured 1', 2, (SELECT id FROM igdb WHERE slug='god-of-war-ragnarok-valhalla')),
-(uuid_generate_v4(), 'Featured 2', 3, (SELECT id FROM igdb WHERE slug='dredge')),
-(uuid_generate_v4(), 'Featured 3', 4, (SELECT id FROM igdb WHERE slug='devil-may-cry-5'));
+(uuid_generate_v4(), 'Game of the Month', 1, (SELECT id FROM igdb WHERE "gameId"=112875));

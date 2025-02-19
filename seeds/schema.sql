@@ -43,17 +43,17 @@ CREATE TABLE IF NOT EXISTS friends (
 -- IGDB Table
 CREATE TABLE IF NOT EXISTS igdb (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "colorDom" VARCHAR(255),
-  "colorSat" VARCHAR(255),
-  esrb VARCHAR(100),
-  "gameId" INTEGER NOT NULL,
-  image VARCHAR(255) NOT NULL,
-  metacritic VARCHAR(255),
-  name VARCHAR(100) NOT NULL,
+  "gameId" INTEGER NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  cover VARCHAR(100),
+  esrb VARCHAR(50),
   rating FLOAT,
-  "ratingTop" FLOAT,
-  released VARCHAR(10) NOT NULL,
-  slug VARCHAR(255)
+  "ratingTop" FLOAT NULL,
+  "releaseDate" VARCHAR(10) NULL,
+  slug VARCHAR(255) NULL,
+  genres JSONB NULL,
+  storyline TEXT NULL,
+  summary TEXT NULL
 );
 
 -- Games Table
