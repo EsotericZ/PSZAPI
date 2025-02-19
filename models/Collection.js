@@ -55,6 +55,18 @@ Collection.init(
       },
       unique: "collection_user_game_unique",
     },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: { min: 1, max: 10 },
+    },
+    year: {
+      type: DataTypes.INTEGER,
+    },
+    goty: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,

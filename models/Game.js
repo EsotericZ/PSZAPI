@@ -11,49 +11,17 @@ Game.init(
       primaryKey: true,
       allowNull: false,
     },
-    colorDom: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    colorSat: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    esrb: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
     gameId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
       allowNull: false,
-    },
-    image: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    metacritic: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
+      unique: true,
     },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    rating: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    ratingTop: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    released: {
-      type: DataTypes.STRING(10),
-      allowNull: false,
-    },
-    slug: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
+    year: {
+      type: DataTypes.INTEGER,
     },
   },
   {

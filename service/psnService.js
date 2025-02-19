@@ -1,3 +1,4 @@
+import { searchGamesByNames } from './igdbService.js';
 import {
   exchangeCodeForAccessToken,
   exchangeNpssoForCode,
@@ -166,12 +167,62 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
     const { trophyTitles } = await getUserTitles(authorization, targetAccountId, { limit: 800 });
 
     const userPS5Games = trophyTitles.filter(game => game.trophyTitlePlatform?.toUpperCase() === "PS5" && !game.hiddenFlag);
+
     const insertValues = [];
     const updateValues = [];
+
+    let missingGames = [];
+    let gameYearMap = {};
+
+    for (const game of userPS5Games) {
+      const existingGame = await query(
+        `SELECT "id", "year" FROM games WHERE "gameId" = $1`,
+        [game.npCommunicationId]
+      );
+
+      if (existingGame.rows.length > 0) {
+        gameYearMap[game.npCommunicationId] = existingGame.rows[0].year;
+      } else {
+        missingGames.push(game.trophyTitleName);
+        gameYearMap[game.npCommunicationId] = null;
+      }
+    }
+
+    if (missingGames.length > 0) {
+      const normalizeGameName = (name) => {
+        return name
+          .replace(/[’]/g, "'")
+          .replace(/[®™]/g, "")
+          .replace(/\s*:\s*/g, ": ")
+          .trim();
+      };
+      
+      const normalizedMissingGames = missingGames.map(normalizeGameName);
+      const igdbResults = await searchGamesByNames(normalizedMissingGames);
+    
+      for (const igdbGame of igdbResults) {
+        const releaseYear = igdbGame.first_release_date
+          ? new Date(igdbGame.first_release_date * 1000).getFullYear()
+          : null;
+    
+        gameYearMap[igdbGame.id] = releaseYear;
+    
+        const insertResult = await query(
+          `INSERT INTO games ("gameId", "name", "year") 
+           VALUES ($1, $2, $3) 
+           ON CONFLICT ("gameId") DO NOTHING`,
+          [igdbGame.id, igdbGame.name, releaseYear]
+        );
+    
+        console.log("Inserted into Games Table:", insertResult.rows);
+      }
+    }
 
     const gamesWithTrophies = await Promise.all(
       userPS5Games.map(async (game) => {
         try {
+          const releaseYear = gameYearMap[game.npCommunicationId] || null;
+
           const titleTrophies = await getTitleTrophies(
             authorization,
             game.npCommunicationId,
@@ -211,24 +262,29 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           );
 
           const platinum = earnedTrophies.platinum > 0;
+
           const escapeSQL = (str) => {
-            if (!str) return "";
+            if (!str) return "NULL";
             return str.replace(/'/g, "''");
           };
 
           insertValues.push(
             `('${userId}', '${game.npCommunicationId}', '${escapeSQL(game.trophyTitleName)}', 
             '${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
-            '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
-            '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 'active')`
+            '${escapeSQL(JSON.stringify(earnedTrophies))}'::jsonb, 
+            '${escapeSQL(JSON.stringify(trophies))}'::jsonb, 
+            ${releaseYear},
+            'active')`
           );
+          
 
           updateValues.push(
             `('${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
-            '${JSON.stringify(earnedTrophies).replace(/'/g, "''")}'::jsonb, 
-            '${JSON.stringify(trophies).replace(/'/g, "''")}'::jsonb, 
+            '${escapeSQL(JSON.stringify(earnedTrophies))}'::jsonb, 
+            '${escapeSQL(JSON.stringify(trophies))}'::jsonb, 
             '${escapeSQL(game.trophyTitleName)}', '${userId}', '${game.npCommunicationId}')`
           );
+
 
           return {
             gameId: game.npCommunicationId,
@@ -237,10 +293,10 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             progress: game.progress,
             earnedTrophies,
             platinum,
+            year: releaseYear,
             trophies,
           };
         } catch (err) {
-          console.error(`Failed to fetch trophies for ${game.trophyTitleName}:`, err);
           return {
             gameId: game.npCommunicationId,
             name: game.trophyTitleName,
@@ -248,6 +304,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             progress: game.progress,
             earnedTrophies,
             platinum: false,
+            year: null,
             error: err.message,
           };
         }
@@ -265,6 +322,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           "platinum", 
           "earnedTrophies", 
           "trophies", 
+          "year",
           "status"
         )
         VALUES ${insertValues.join(", ")}
@@ -275,6 +333,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           "platinum" = EXCLUDED."platinum",
           "earnedTrophies" = EXCLUDED."earnedTrophies",
           "trophies" = EXCLUDED."trophies",
+          "year" = EXCLUDED."year",
           "name" = EXCLUDED."name"
       `;
 

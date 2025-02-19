@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
   "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the Friends Table
+-- Friends Table
 CREATE TABLE IF NOT EXISTS friends (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   "userId" UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -40,8 +40,8 @@ CREATE TABLE IF NOT EXISTS friends (
   CONSTRAINT unique_friend UNIQUE ("userId", "psnAccountId")
 );
 
--- Games Table
-CREATE TABLE IF NOT EXISTS games (
+-- IGDB Table
+CREATE TABLE IF NOT EXISTS igdb (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   "colorDom" VARCHAR(255),
   "colorSat" VARCHAR(255),
@@ -56,13 +56,21 @@ CREATE TABLE IF NOT EXISTS games (
   slug VARCHAR(255)
 );
 
+-- Games Table
+CREATE TABLE IF NOT EXISTS games (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "gameId" VARCHAR(100) NOT NULL UNIQUE,
+  name VARCHAR(100) NOT NULL,
+  year INTEGER
+);
+
 -- Featured Table
 CREATE TABLE IF NOT EXISTS featured (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   description VARCHAR(100) UNIQUE NOT NULL,
   "order" INTEGER NOT NULL,
   "gameId" UUID NOT NULL,
-  CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES games (id) ON DELETE CASCADE
+  CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES igdb (id) ON DELETE CASCADE
 );
 
 -- Ratings Table
@@ -99,6 +107,9 @@ CREATE TABLE IF NOT EXISTS collection (
   trophies JSONB NOT NULL DEFAULT '[]'::JSONB,
   status VARCHAR(20) NOT NULL,
   "userId" UUID NOT NULL,
+  rating INTEGER CHECK (rating BETWEEN 1 AND 10),
+  year INTEGER,
+  goty BOOLEAN DEFAULT FALSE,
   CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE,
   CONSTRAINT collection_user_game_unique UNIQUE ("userId", "gameId")
 );

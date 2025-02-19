@@ -3,18 +3,19 @@ import Collection from './Collection.js';
 import Featured from './Featured.js';
 import Friend from './Friend.js';
 import Game from './Game.js';
+import IGDB from './IGDB.js';
 import Rating from './Rating.js';
 import Review from './Review.js';
 import User from './User.js';
 import Wishlist from './Wishlist.js';
 
 // Featured to Game Relationships
-Featured.belongsTo(Game, { 
+Featured.belongsTo(IGDB, { 
   foreignKey: 'gameId', 
   as: 'game' 
 });
 
-Game.hasMany(Featured, { 
+IGDB.hasMany(Featured, { 
   foreignKey: 'gameId', 
   as: 'featured' 
 });
@@ -122,6 +123,7 @@ export {
   Featured,
   Friend,
   Game,
+  IGDB,
   Rating,
   Review,
   User,

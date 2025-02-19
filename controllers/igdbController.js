@@ -1,5 +1,22 @@
+import query from '../db/index.js';
 const clientId = process.env.TWITCH_ID;
 const accessToken = process.env.TWITCH_ACCESS_TOKEN;
+
+export const getAllGames = async (req, res) => {
+  try {
+    const statement = `
+      SELECT *
+      FROM igdb
+      ORDER BY name ASC
+    `;
+    const result = await query(statement);
+
+    res.status(200).send(result.rows);
+  } catch (error) {
+    console.error('Error Getting Games', error);
+    res.status(500).send({ error: 'Unable To Retrieve Games Requested' });
+  }
+}
 
 export const searchGames = async (req, res) => {
   const { game } = req.body;
@@ -67,5 +84,6 @@ export const searchGames = async (req, res) => {
 };
 
 export const testController = {
-  searchGames
+  getAllGames,
+  searchGames,
 }
