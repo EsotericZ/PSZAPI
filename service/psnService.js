@@ -174,7 +174,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
 
     for (const game of userPS5Games) {
       const existingGame = await query(
-        `SELECT "id", "year", "igdbId" FROM games WHERE "gameId" = $1`,
+        `SELECT "id", "year", "igdbId" FROM games WHERE "psnId" = $1`,
         [game.npCommunicationId]
       );
 
@@ -219,9 +219,9 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
     
         try {
           await query(
-            `INSERT INTO games ("gameId", "name", "year", "igdbId") 
+            `INSERT INTO games ("psnId", "name", "year", "igdbId") 
              VALUES ($1, $2, $3, $4) 
-             ON CONFLICT ("gameId") DO NOTHING`,
+             ON CONFLICT ("psnId") DO NOTHING`,
             [game.npCommunicationId, gameName, releaseYear, igdbId]
           );
         } catch (error) {
@@ -297,7 +297,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           );
 
           return {
-            gameId: game.npCommunicationId,
+            psnId: game.npCommunicationId,
             name: game.trophyTitleName,
             image: game.trophyTitleIconUrl,
             progress: game.progress,
@@ -308,7 +308,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           };
         } catch (err) {
           return {
-            gameId: game.npCommunicationId,
+            psnId: game.npCommunicationId,
             name: game.trophyTitleName,
             image: game.trophyTitleIconUrl,
             progress: game.progress,
@@ -325,7 +325,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
       const insertQuery = `
         INSERT INTO collection (
           "userId", 
-          "gameId", 
+          "psnId", 
           "name", 
           "image", 
           "progress", 
@@ -336,7 +336,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           "status"
         )
         VALUES ${insertValues.join(", ")}
-        ON CONFLICT ("userId", "gameId") 
+        ON CONFLICT ("userId", "psnId") 
         DO UPDATE SET 
           "image" = EXCLUDED."image",
           "progress" = EXCLUDED."progress",

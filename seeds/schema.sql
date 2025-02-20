@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS igdb (
 -- Games Table
 CREATE TABLE IF NOT EXISTS games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "gameId" VARCHAR(100) NOT NULL UNIQUE,
-  "igdbId" INTEGER NOT NULL UNIQUE,
+  "psnId" VARCHAR(100) NOT NULL UNIQUE,
+  "igdbId" UUID NOT NULL,
   name VARCHAR(100) NOT NULL,
   year INTEGER
 );
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 -- Collection Table
 CREATE TABLE IF NOT EXISTS collection (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "gameId" VARCHAR(100) NOT NULL,
+  "psnId" VARCHAR(100) NOT NULL,
   name VARCHAR(100) NOT NULL,
   image VARCHAR(255) NOT NULL,
   progress INTEGER NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS collection (
   year INTEGER,
   goty BOOLEAN DEFAULT FALSE,
   CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE,
-  CONSTRAINT collection_user_game_unique UNIQUE ("userId", "gameId")
+  CONSTRAINT collection_user_game_unique UNIQUE ("userId", "psnId")
 );
 
 -- Backlog Table
@@ -153,7 +153,7 @@ CREATE INDEX idx_featured_gameId ON featured ("igdbId");
 CREATE INDEX idx_review_gameId ON reviews ("gameId");
 
 -- Index For Collection
-CREATE INDEX idx_collection_gameId ON collection ("gameId");
+CREATE INDEX idx_collection_gameId ON collection ("psnId");
 CREATE INDEX idx_collection_userId ON collection ("userId");
 
 -- Index For Backlog

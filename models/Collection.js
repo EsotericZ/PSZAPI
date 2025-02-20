@@ -11,7 +11,7 @@ Collection.init(
       primaryKey: true,
       allowNull: false,
     },
-    gameId: {
+    psnId: {
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: "collection_user_game_unique",
@@ -76,7 +76,7 @@ Collection.init(
     indexes: [
       {
         unique: true,
-        fields: ["userId", "gameId"],
+        fields: ["userId", "psnId"],
       },
     ],
   }

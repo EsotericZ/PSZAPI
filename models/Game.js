@@ -11,7 +11,7 @@ Game.init(
       primaryKey: true,
       allowNull: false,
     },
-    gameId: {
+    psnId: {
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
