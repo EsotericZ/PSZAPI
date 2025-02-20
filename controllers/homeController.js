@@ -5,7 +5,7 @@ export const getAllFeatured = async (req, res) => {
     const statement = `
       SELECT F.*, G.*
       FROM featured F
-      JOIN igdb G ON F."gameId" = G.id
+      JOIN igdb G ON F."igdbId" = G.id
     `;
     const result = await query(statement);
 

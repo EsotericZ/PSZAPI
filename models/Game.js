@@ -17,7 +17,7 @@ Game.init(
       unique: true,
     },
     igdbId: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.INTEGER,
       allowNull: false,
       unique: true,
     },

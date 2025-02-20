@@ -20,6 +20,7 @@ export const getAllGames = async (req, res) => {
 
 export const searchGames = async (req, res) => {
   const { game } = req.body;
+
   const esrbRatings = {
     6: "RP (Rating Pending)",
     7: "EC (Early Childhood)",
@@ -95,7 +96,7 @@ export const searchGames = async (req, res) => {
     const games = data.map(game => ({
       gameId: game.id,
       name: game.name,
-      cover: game.cover.image_id || null,
+      cover: game.cover?.image_id || null,
       esrb: getEsrbRating(game.age_ratings),
       rating: game.aggregated_rating || 'No Rating',
       releaseDate: game.first_release_date 
