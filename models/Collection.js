@@ -56,7 +56,7 @@ Collection.init(
       unique: "collection_user_game_unique",
     },
     rating: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: true,
       validate: { min: 1, max: 10 },
     },

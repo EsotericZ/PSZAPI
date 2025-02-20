@@ -9,14 +9,28 @@ import Review from './Review.js';
 import User from './User.js';
 import Wishlist from './Wishlist.js';
 
+// Game <-> IGDB (One-to-One Relationship)
+Game.belongsTo(IGDB, { 
+  foreignKey: 'igdbId', 
+  targetKey: 'igdbId',
+  as: 'igdb',
+});
+
+IGDB.hasOne(Game, { 
+  foreignKey: 'igdbId', 
+  sourceKey: 'igdbId',
+  as: 'game',
+});
+
+
 // Featured to Game Relationships
 Featured.belongsTo(IGDB, { 
-  foreignKey: 'gameId', 
+  foreignKey: 'igdbId', 
   as: 'game' 
 });
 
 IGDB.hasMany(Featured, { 
-  foreignKey: 'gameId', 
+  foreignKey: 'igdbId', 
   as: 'featured' 
 });
 

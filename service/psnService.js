@@ -165,63 +165,75 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
 
     const targetAccountId = allAccountsSearchResults.domainResponses[0].results[0].socialMetadata.accountId;
     const { trophyTitles } = await getUserTitles(authorization, targetAccountId, { limit: 800 });
-
     const userPS5Games = trophyTitles.filter(game => game.trophyTitlePlatform?.toUpperCase() === "PS5" && !game.hiddenFlag);
 
     const insertValues = [];
     const updateValues = [];
-
     let missingGames = [];
-    let gameYearMap = {};
+    let gameDataMap = {};
 
     for (const game of userPS5Games) {
       const existingGame = await query(
-        `SELECT "id", "year" FROM games WHERE "gameId" = $1`,
+        `SELECT "id", "year", "igdbId" FROM games WHERE "gameId" = $1`,
         [game.npCommunicationId]
       );
 
       if (existingGame.rows.length > 0) {
-        gameYearMap[game.npCommunicationId] = existingGame.rows[0].year;
+        gameDataMap[game.npCommunicationId] = {
+          year: existingGame.rows[0].year,
+          igdbId: existingGame.rows[0].igdbId,
+        }
       } else {
         missingGames.push(game.trophyTitleName);
-        gameYearMap[game.npCommunicationId] = null;
+        gameDataMap[game.npCommunicationId] = { year: null, igdbId: null };
       }
     }
 
     if (missingGames.length > 0) {
       const normalizeGameName = (name) => {
         return name
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
           .replace(/[’]/g, "'")
           .replace(/[®™]/g, "")
           .replace(/\s*:\s*/g, ": ")
           .trim();
       };
-      
+
       const normalizedMissingGames = missingGames.map(normalizeGameName);
       const igdbResults = await searchGamesByNames(normalizedMissingGames);
     
-      for (const igdbGame of igdbResults) {
+      for (const game of userPS5Games) {  
+        const igdbGame = igdbResults.shift();  
+    
+        if (!igdbGame) {
+          console.error(`ERROR: IGDB match not found for ${game.trophyTitleName}`);
+          continue;
+        }
+    
         const releaseYear = igdbGame.first_release_date
           ? new Date(igdbGame.first_release_date * 1000).getFullYear()
           : null;
     
-        gameYearMap[igdbGame.id] = releaseYear;
+        const igdbId = igdbGame.id;
+        const gameName = game.trophyTitleName; 
     
-        const insertResult = await query(
-          `INSERT INTO games ("gameId", "name", "year") 
-           VALUES ($1, $2, $3) 
-           ON CONFLICT ("gameId") DO NOTHING`,
-          [igdbGame.id, igdbGame.name, releaseYear]
-        );
-    
-        console.log("Inserted into Games Table:", insertResult.rows);
+        try {
+          await query(
+            `INSERT INTO games ("gameId", "name", "year", "igdbId") 
+             VALUES ($1, $2, $3, $4) 
+             ON CONFLICT ("gameId") DO NOTHING`,
+            [game.npCommunicationId, gameName, releaseYear, igdbId]
+          );
+        } catch (error) {
+          console.error(`ERROR inserting ${gameName}:`, error);
+        }
       }
     }
 
     const gamesWithTrophies = await Promise.all(
       userPS5Games.map(async (game) => {
         try {
-          const releaseYear = gameYearMap[game.npCommunicationId] || null;
+          const releaseYear = gameDataMap[game.npCommunicationId]?.year || null;
 
           const titleTrophies = await getTitleTrophies(
             authorization,
@@ -276,7 +288,6 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             ${releaseYear},
             'active')`
           );
-          
 
           updateValues.push(
             `('${escapeSQL(game.trophyTitleIconUrl)}', ${game.progress}, ${platinum}, 
@@ -284,7 +295,6 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             '${escapeSQL(JSON.stringify(trophies))}'::jsonb, 
             '${escapeSQL(game.trophyTitleName)}', '${userId}', '${game.npCommunicationId}')`
           );
-
 
           return {
             gameId: game.npCommunicationId,
@@ -336,7 +346,6 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           "year" = EXCLUDED."year",
           "name" = EXCLUDED."name"
       `;
-
       await query(insertQuery);
     }
 

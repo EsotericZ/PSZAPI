@@ -20,11 +20,11 @@ Featured.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    gameId: {
+    igdbId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'games',
+        model: 'igdb',
         key: 'id',
       },
     },

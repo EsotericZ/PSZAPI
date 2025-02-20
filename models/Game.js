@@ -16,6 +16,11 @@ Game.init(
       allowNull: false,
       unique: true,
     },
+    igdbId: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true,
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,

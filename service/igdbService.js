@@ -27,8 +27,6 @@ export const searchGamesByNames = async (gameNames) => {
         body: queryBody,
       });
 
-      console.log(response)
-
       if (!response.ok) {
         console.error("IGDB API Error:", await response.text());
         continue;

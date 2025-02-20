@@ -11,7 +11,7 @@ IGDB.init(
       primaryKey: true,
       allowNull: false,
     },
-    gameId: { 
+    igdbId: { 
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: true,

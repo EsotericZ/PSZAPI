@@ -43,13 +43,12 @@ CREATE TABLE IF NOT EXISTS friends (
 -- IGDB Table
 CREATE TABLE IF NOT EXISTS igdb (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "gameId" INTEGER NOT NULL UNIQUE,
+  "igdbId" INTEGER NOT NULL UNIQUE,
   name VARCHAR(255) NOT NULL,
   cover VARCHAR(100),
   esrb VARCHAR(50),
   rating FLOAT,
-  "ratingTop" FLOAT NULL,
-  "releaseDate" VARCHAR(10) NULL,
+  released VARCHAR(10) NULL,
   slug VARCHAR(255) NULL,
   genres JSONB NULL,
   storyline TEXT NULL,
@@ -60,6 +59,7 @@ CREATE TABLE IF NOT EXISTS igdb (
 CREATE TABLE IF NOT EXISTS games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   "gameId" VARCHAR(100) NOT NULL UNIQUE,
+  "igdbId" VARCHAR(100) NOT NULL UNIQUE,
   name VARCHAR(100) NOT NULL,
   year INTEGER
 );
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS featured (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   description VARCHAR(100) UNIQUE NOT NULL,
   "order" INTEGER NOT NULL,
-  "gameId" UUID NOT NULL,
-  CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES igdb (id) ON DELETE CASCADE
+  "igdbId" UUID NOT NULL,
+  CONSTRAINT fk_game FOREIGN KEY ("igdbId") REFERENCES igdb (id) ON DELETE CASCADE
 );
 
 -- Ratings Table
@@ -147,7 +147,7 @@ CREATE INDEX idx_rating_gameId ON ratings ("gameId");
 CREATE INDEX idx_rating_userId ON ratings ("userId");
 
 -- Index For Featured
-CREATE INDEX idx_featured_gameId ON featured ("gameId");
+CREATE INDEX idx_featured_gameId ON featured ("igdbId");
 
 -- Index For Review
 CREATE INDEX idx_review_gameId ON reviews ("gameId");

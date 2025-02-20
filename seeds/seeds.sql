@@ -8,14 +8,14 @@ INSERT INTO users (id, email, psn, role, verified, "verifyCode", "firstTime", "c
 (uuid_generate_v4(), 'd@gmail.com', 'Player2', 2001, TRUE, '5AS42Y', FALSE, '2023-05-12 16:00:00'),
 (uuid_generate_v4(), 'cjsand03@gmail.com', NULL, 1089, FALSE, NULL, TRUE, '2023-06-25 09:15:00');
 
--- Insert seed data into the games table
-INSERT INTO igdb (id, cover, esrb, "gameId", name, rating, "releaseDate", slug, genres, storyline, summary) VALUES
+-- Insert seed data into the IGDB table
+INSERT INTO igdb (id, "igdbId", name, cover, esrb, rating, released, slug, genres, storyline, summary) VALUES
 (
   uuid_generate_v4(), 
-  'co5s5v', 
-  'M (Mature 17+)', 
   112875, 
   'God of War Ragnarök', 
+  'co5s5v', 
+  'M (Mature 17+)', 
   94.61538461538461, 
   '2022-11-09', 
   'god-of-war-ragnarok', 
@@ -25,5 +25,5 @@ INSERT INTO igdb (id, cover, esrb, "gameId", name, rating, "releaseDate", slug, 
 );
 
 -- Insert seed data into the games table
-INSERT INTO featured (id, description, "order", "gameId") VALUES
-(uuid_generate_v4(), 'Game of the Month', 1, (SELECT id FROM igdb WHERE "gameId"=112875));
+INSERT INTO featured (id, description, "order", "igdbId") VALUES
+(uuid_generate_v4(), 'Game of the Month', 1, (SELECT id FROM igdb WHERE "igdbId"=112875));
