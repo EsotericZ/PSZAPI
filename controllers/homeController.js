@@ -14,8 +14,8 @@ export const getAllFeatured = async (req, res) => {
         ON F."igdbId" = I.id
       GROUP BY F.id, I.id;
     `;
-    const result = await query(statement, [userId]);
-    console.log(result)
+    const result = await query(statement);
+    console.log(result.rows)
 
     res.status(200).send(result.rows);
   } catch (error) {

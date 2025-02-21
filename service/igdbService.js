@@ -3,6 +3,7 @@ const accessToken = process.env.TWITCH_ACCESS_TOKEN;
 
 export const searchGamesByNames = async (gameNames) => {
   if (!Array.isArray(gameNames) || gameNames.length === 0) return [];
+  console.log(gameNames)
 
   try {
     let results = [];

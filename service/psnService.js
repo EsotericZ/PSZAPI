@@ -182,47 +182,58 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
         gameDataMap[game.npCommunicationId] = {
           year: existingGame.rows[0].year,
           igdbId: existingGame.rows[0].igdbId,
-        }
+        };
       } else {
-        missingGames.push(game.trophyTitleName);
-        gameDataMap[game.npCommunicationId] = { year: null, igdbId: null };
+        missingGames.push({
+          psnId: game.npCommunicationId,
+          name: game.trophyTitleName,
+        });
+        gameDataMap[game.npCommunicationId] = {
+          year: null,
+          igdbId: null,
+        };
       }
     }
 
     if (missingGames.length > 0) {
       const normalizeGameName = (name) => {
         return name
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
           .replace(/[’]/g, "'")
           .replace(/[®™]/g, "")
           .replace(/\s*:\s*/g, ": ")
           .trim();
       };
 
-      const normalizedMissingGames = missingGames.map(normalizeGameName);
-      const igdbResults = await searchGamesByNames(normalizedMissingGames);
+      const normalizedMissingGames = missingGames.map(game => ({
+        ...game,
+        normalizedName: normalizeGameName(game.name),
+      }));
+      const igdbResults = await searchGamesByNames(normalizedMissingGames.map(game => game.normalizedName));
     
-      for (const game of userPS5Games) {  
+      for (const game of normalizedMissingGames) {  
         const igdbGame = igdbResults.shift();  
     
         if (!igdbGame) {
-          console.error(`ERROR: IGDB match not found for ${game.trophyTitleName}`);
+          console.error(`ERROR: IGDB match not found for ${game.name}`);
           continue;
         }
     
         const releaseYear = igdbGame.first_release_date
           ? new Date(igdbGame.first_release_date * 1000).getFullYear()
           : null;
-    
         const igdbId = igdbGame.id;
-        const gameName = game.trophyTitleName; 
+
+        gameDataMap[game.psnId] = {
+          year: releaseYear,
+          igdbId: igdbId,
+        };
     
         try {
           await query(
             `INSERT INTO games ("psnId", "name", "year", "igdbId") 
              VALUES ($1, $2, $3, $4) 
              ON CONFLICT ("psnId") DO NOTHING`,
-            [game.npCommunicationId, gameName, releaseYear, igdbId]
+            [game.psnId, game.name, releaseYear, igdbId]
           );
         } catch (error) {
           console.error(`ERROR inserting ${gameName}:`, error);
