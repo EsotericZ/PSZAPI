@@ -109,12 +109,6 @@ CREATE TABLE IF NOT EXISTS collection (
 -- Backlog Table
 CREATE TABLE IF NOT EXISTS backlog (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "psnName" VARCHAR(100) NOT NULL,
-  "psnIcon" VARCHAR(255) NOT NULL,
-  progress INTEGER NOT NULL,
-  platinum BOOLEAN DEFAULT FALSE,
-  status VARCHAR(20) NOT NULL,
-  "order" INTEGER NOT NULL,
   "gameId" UUID NOT NULL,
   "userId" UUID NOT NULL,
   CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES games (id) ON DELETE CASCADE,

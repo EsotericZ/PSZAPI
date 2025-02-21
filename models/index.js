@@ -21,8 +21,20 @@ IGDB.hasOne(Game, {
   as: 'game',
 });
 
+// Game ↔ Collection (One-to-Many Relationship)
+Game.hasMany(Collection, { 
+  foreignKey: 'psnId', 
+  sourceKey: 'psnId', 
+  as: 'collections',
+});
 
-// Featured to Game Relationships
+Collection.belongsTo(Game, { 
+  foreignKey: 'psnId', 
+  targetKey: 'psnId', 
+  as: 'game',
+});
+
+// Featured ↔ IGDB (One-to-Many Relationship)
 Featured.belongsTo(IGDB, { 
   foreignKey: 'igdbId', 
   as: 'game' 
@@ -33,7 +45,7 @@ IGDB.hasMany(Featured, {
   as: 'featured' 
 });
 
-// Reviews Relationships
+// Game ↔ Reviews (One-to-Many Relationship)
 Review.belongsTo(Game, {
   foreignKey: 'gameId',
   as: 'game',
@@ -44,7 +56,7 @@ Game.hasMany(Review, {
   as: 'reviews',
 });
 
-// Collection Relationships
+// Collection ↔ User (One-to-Many Relationship)
 Collection.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',
@@ -55,7 +67,7 @@ User.hasMany(Collection, {
   as: 'collections',
 });
 
-// Backlog Relationships
+// Backlog ↔ Game & User (One-to-Many Relationship)
 Backlog.belongsTo(Game, {
   foreignKey: 'gameId',
   as: 'game',
@@ -76,7 +88,7 @@ User.hasMany(Backlog, {
   as: 'backlogs',
 });
 
-// Wishlist Relationships
+// Wishlist ↔ Game & User (One-to-Many Relationship)
 Wishlist.belongsTo(Game, {
   foreignKey: 'gameId',
   as: 'game',
@@ -97,7 +109,7 @@ User.hasMany(Wishlist, {
   as: 'wishlists',
 });
 
-// Friends Relationships
+// User ↔ Friends (One-to-Many Relationship)
 User.hasMany(Friend, {
   foreignKey: "userId",
   as: "friends",
@@ -107,7 +119,6 @@ Friend.belongsTo(User, {
   foreignKey: "userId",
   as: "user",
 });
-
 
 export {
   Backlog,

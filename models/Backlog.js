@@ -11,30 +11,6 @@ Backlog.init(
       primaryKey: true,
       allowNull: false,
     },
-    psnName: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    psnIcon: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    progress: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    platinum: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    status: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    order: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     gameId: {
       type: DataTypes.UUID,
       allowNull: false,
