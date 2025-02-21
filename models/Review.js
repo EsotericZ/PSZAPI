@@ -24,6 +24,9 @@ Review.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    video: {
+      type: DataTypes.STRING(255),
+    },
     gameId: {
       type: DataTypes.UUID,
       allowNull: false,

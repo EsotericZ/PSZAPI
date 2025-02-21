@@ -8,11 +8,16 @@ export const getAllFeatured = async (req, res) => {
     const statement = `
       SELECT 
         F.*, 
-        I.name, I.cover, I.esrb, I.rating, I.released, I.slug, I.genres, I.storyline, I.summary
+        I.name, I.cover, I.esrb, I.rating AS "igdbRating", I.released, I.slug, I.genres, I.storyline, I.summary,
+        G."totalRating", G."ratingCount", G."gotyCount",
+        R.id AS review_id, R.rating AS "pszRating", R.review, R.video
       FROM featured F
       JOIN igdb I 
         ON F."igdbId" = I.id
-      GROUP BY F.id, I.id;
+      JOIN games G
+        ON I."igdbId" = G."igdbId"
+      LEFT JOIN reviews R 
+        ON G.id = R."gameId";
     `;
     const result = await query(statement);
     console.log(result.rows)
@@ -27,36 +32,3 @@ export const getAllFeatured = async (req, res) => {
 export const userController = {
   getAllFeatured,
 }
-
-
-
-// COALESCE(AVG(C.rating), 0) AS avg_rating,
-// COUNT(C.rating) AS rating_count,
-// COUNT(CASE WHEN C.goty = TRUE THEN 1 END) AS goty_count,
-
-// CASE 
-//   WHEN $1::UUID IS NOT NULL THEN EXISTS (
-//     SELECT 1 
-//     FROM collection C2 
-//     WHERE C2."userId" = $1::UUID AND C2."psnId" = G."psnId"
-//   ) 
-//   ELSE FALSE 
-// END AS user_owns,
-
-// CASE 
-//   WHEN $1::UUID IS NOT NULL THEN EXISTS (
-//     SELECT 1 
-//     FROM wishlist W 
-//     WHERE W."userId" = $1::UUID AND W."gameId" = G.id
-//   ) 
-//   ELSE FALSE 
-// END AS in_wishlist,
-
-// CASE 
-//   WHEN $1::UUID IS NOT NULL THEN EXISTS (
-//     SELECT 1 
-//     FROM backlog B 
-//     WHERE B."userId" = $1::UUID AND B."gameId" = G.id
-//   ) 
-//   ELSE FALSE 
-// END AS in_backlog

@@ -61,7 +61,10 @@ CREATE TABLE IF NOT EXISTS games (
   "psnId" VARCHAR(100) NOT NULL UNIQUE,
   "igdbId" INTEGER NOT NULL,
   name VARCHAR(100) NOT NULL,
-  year INTEGER
+  year INTEGER,
+  "totalRating" INTEGER NOT NULL DEFAULT 0,
+  "ratingCount" INTEGER NOT NULL DEFAULT 0,
+  "gotyCount" INTEGER NOT NULL DEFAULT 0
 );
 
 -- Featured Table
@@ -73,24 +76,13 @@ CREATE TABLE IF NOT EXISTS featured (
   CONSTRAINT fk_game FOREIGN KEY ("igdbId") REFERENCES igdb (id) ON DELETE CASCADE
 );
 
--- Ratings Table
-CREATE TABLE IF NOT EXISTS ratings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "userRating" FLOAT,
-  "userReview" TEXT,
-  goty BOOLEAN DEFAULT FALSE,
-  "gameId" UUID NOT NULL,
-  "userId" UUID NOT NULL,
-  CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES games (id) ON DELETE CASCADE,
-  CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE CASCADE
-);
-
 -- Reviews Table
 CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   rating FLOAT,
   review TEXT,
   goty BOOLEAN DEFAULT FALSE,
+  video VARCHAR(255),
   "gameId" UUID NOT NULL,
   CONSTRAINT fk_game FOREIGN KEY ("gameId") REFERENCES games (id) ON DELETE CASCADE
 );
@@ -141,10 +133,6 @@ CREATE TABLE IF NOT EXISTS wishlist (
 -- ==========================
 -- PERFORMANCE INDEXES
 -- ==========================
-
--- Index For Rating
-CREATE INDEX idx_rating_gameId ON ratings ("gameId");
-CREATE INDEX idx_rating_userId ON ratings ("userId");
 
 -- Index For Featured
 CREATE INDEX idx_featured_gameId ON featured ("igdbId");

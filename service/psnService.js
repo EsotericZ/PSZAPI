@@ -219,7 +219,9 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
         }
     
         const releaseYear = igdbGame.first_release_date
-          ? new Date(igdbGame.first_release_date * 1000).getFullYear()
+          ? (typeof igdbGame.first_release_date === "string"
+            ? parseInt(igdbGame.first_release_date.split("-")[0], 10)
+            : new Date(igdbGame.first_release_date * 1000).getFullYear())
           : null;
         const igdbId = igdbGame.id;
 
@@ -227,7 +229,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           year: releaseYear,
           igdbId: igdbId,
         };
-    
+
         try {
           await query(
             `INSERT INTO games ("psnId", "name", "year", "igdbId") 
@@ -236,7 +238,7 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             [game.psnId, game.name, releaseYear, igdbId]
           );
         } catch (error) {
-          console.error(`ERROR inserting ${gameName}:`, error);
+          console.error(`ERROR inserting ${game.mame}:`, error);
         }
       }
     }
