@@ -13,7 +13,7 @@ Game.init(
     },
     psnId: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     igdbId: {
@@ -23,7 +23,7 @@ Game.init(
     },
     name: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     year: {
       type: DataTypes.INTEGER,
