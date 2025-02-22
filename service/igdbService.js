@@ -26,6 +26,7 @@ export const searchGamesByNames = async (gameNames) => {
 
     for (const gameName of gameNames) {
       const sanitizedGameName = gameName.replace(/’/g, "'");
+      console.log(sanitizedGameName)
 
       const existingIGDBGame = await query(`
           SELECT * 
@@ -80,6 +81,16 @@ export const searchGamesByNames = async (gameNames) => {
         const storyline = igdbGame.storyline || null;
         const summary = igdbGame.summary || null;
 
+        const existingIGDBGameById = await query(`
+          SELECT * FROM igdb WHERE "igdbId" = $1 LIMIT 1
+        `, [igdbId]);
+
+        if (existingIGDBGameById.rows.length > 0) {
+          console.log(`✅ IGDB game already exists: ${name} (ID: ${igdbId})`);
+          results.push(existingIGDBGameById.rows[0]);
+          continue;
+        }
+
         await query(`
           INSERT INTO igdb (
             "igdbId", 
@@ -109,18 +120,28 @@ export const searchGamesByNames = async (gameNames) => {
           ]
         );
 
-        results.push({
-          id: igdbId,
-          name,
-          cover,
-          esrb,
-          rating,
-          first_release_date: released,
-          slug,
-          genres,
-          storyline,
-          summary
-        });
+        console.log(`✅ Inserted new IGDB game: ${name} (ID: ${igdbId})`);
+
+        // results.push({
+        //   id: igdbId,
+        //   name,
+        //   cover,
+        //   esrb,
+        //   rating,
+        //   first_release_date: released,
+        //   slug,
+        //   genres,
+        //   storyline,
+        //   summary
+        // });
+
+        const newIGDBGame = await query(`
+          SELECT * FROM igdb WHERE "igdbId" = $1 LIMIT 1
+        `, [igdbId]);
+
+        if (newIGDBGame.rows.length > 0) {
+          results.push(newIGDBGame.rows[0]); // ✅ Now `id` is always UUID, `igdbId` is always INTEGER
+        }
       }
     }
 

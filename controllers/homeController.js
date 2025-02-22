@@ -7,10 +7,10 @@ export const getAllFeatured = async (req, res) => {
   try {
     const statement = `
       SELECT 
-        F.*, 
-        I.name, I.cover, I.esrb, I.rating AS "igdbRating", I.released, I.slug, I.genres, I.storyline, I.summary,
-        G."psnId", G."totalRating", G."ratingCount", G."gotyCount",
-        R.id AS review_id, R.rating AS "pszRating", R.review, R.video,
+        F.description, F.order, 
+        I."igdbId", I.name, I.cover, I.esrb, I.rating AS "igdbRating", I.released, I.slug, I.genres, I.storyline, I.summary,
+        G.id AS "gameId", G."totalRating", G."ratingCount", G."gotyCount",
+        R.rating AS "pszRating", R.review, R.video,
         ${userId ? `
           EXISTS (
             SELECT 1 FROM collection C 
@@ -31,7 +31,7 @@ export const getAllFeatured = async (req, res) => {
       FROM featured F
       JOIN igdb I 
         ON F."igdbId" = I.id
-      JOIN games G
+      LEFT JOIN games G
         ON I."igdbId" = G."igdbId"
       LEFT JOIN reviews R 
         ON G.id = R."gameId";

@@ -208,6 +208,8 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
         ...game,
         normalizedName: normalizeGameName(game.name),
       }));
+
+      console.log(normalizedMissingGames)
       const igdbResults = await searchGamesByNames(normalizedMissingGames.map(game => game.normalizedName));
     
       for (const game of normalizedMissingGames) {  
@@ -223,7 +225,10 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
             ? parseInt(igdbGame.first_release_date.split("-")[0], 10)
             : new Date(igdbGame.first_release_date * 1000).getFullYear())
           : null;
-        const igdbId = igdbGame.id;
+        const igdbId = igdbGame.igdbId;
+        console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        console.log(igdbGame)
+        console.log("IGDBID: ", igdbId)
 
         gameDataMap[game.psnId] = {
           year: releaseYear,
