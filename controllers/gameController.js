@@ -5,7 +5,7 @@ export const getAllGames = async (req, res) => {
     const statement = `
       SELECT *
       FROM games
-      ORDER BY name ASC
+      ORDER BY "psnName" ASC
     `;
     const result = await query(statement);
 

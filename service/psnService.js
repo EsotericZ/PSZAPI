@@ -221,10 +221,10 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
           continue;
         }
     
-        const releaseYear = igdbGame.first_release_date
-          ? (typeof igdbGame.first_release_date === "string"
-            ? parseInt(igdbGame.first_release_date.split("-")[0], 10)
-            : new Date(igdbGame.first_release_date * 1000).getFullYear())
+        const releaseYear = igdbGame.released
+          ? (typeof igdbGame.released === "string"
+            ? parseInt(igdbGame.released.split("-")[0], 10)
+            : new Date(igdbGame.released * 1000).getFullYear())
           : null;
         const igdbId = igdbGame.igdbId;
         console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
