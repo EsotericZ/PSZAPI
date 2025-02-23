@@ -21,7 +21,11 @@ Game.init(
       allowNull: false,
       unique: true,
     },
-    name: {
+    psnName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    igdbName: {
       type: DataTypes.STRING(100),
       allowNull: true,
     },
@@ -42,6 +46,10 @@ Game.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+    },
+    confirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   },
   {

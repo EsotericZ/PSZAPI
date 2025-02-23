@@ -69,7 +69,3 @@ INSERT INTO featured (id, description, "order", "igdbId") VALUES
 (uuid_generate_v4(), 'Featured 1', 2, (SELECT id FROM igdb WHERE "igdbId"=164867)),
 (uuid_generate_v4(), 'Featured 2', 3, (SELECT id FROM igdb WHERE "igdbId"=214397)),
 (uuid_generate_v4(), 'Featured 3', 4, (SELECT id FROM igdb WHERE "igdbId"=119171));
-
--- Insert seed data into the Games table
--- INSERT INTO games (id, "psnId", "igdbId", name, year) VALUES
--- (uuid_generate_v4(), 'NPWR20188_00', 134597, 'ASTRO''s PLAYROOM', 2020);

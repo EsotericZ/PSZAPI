@@ -60,11 +60,13 @@ CREATE TABLE IF NOT EXISTS games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   "psnId" VARCHAR(100) UNIQUE,
   "igdbId" INTEGER NOT NULL UNIQUE,
-  name VARCHAR(100),
+  "psnName" VARCHAR(100),
+  "igdbName" VARCHAR(100),
   year INTEGER,
   "totalRating" INTEGER NOT NULL DEFAULT 0,
   "ratingCount" INTEGER NOT NULL DEFAULT 0,
-  "gotyCount" INTEGER NOT NULL DEFAULT 0
+  "gotyCount" INTEGER NOT NULL DEFAULT 0,
+  confirmed BOOLEAN DEFAULT FALSE
 );
 
 -- Featured Table

@@ -173,10 +173,11 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
     let gameDataMap = {};
 
     for (const game of userPS5Games) {
-      const existingGame = await query(
-        `SELECT "id", "year", "igdbId" FROM games WHERE "psnId" = $1`,
-        [game.npCommunicationId]
-      );
+      const existingGame = await query(`
+        SELECT "id", "year", "igdbId" 
+        FROM games 
+        WHERE "psnId" = $1
+      `, [game.npCommunicationId]);
 
       if (existingGame.rows.length > 0) {
         gameDataMap[game.npCommunicationId] = {
@@ -237,10 +238,10 @@ export const getPSNUserGames = async (userId, userPsn, NPSSO) => {
 
         try {
           await query(
-            `INSERT INTO games ("psnId", "name", "year", "igdbId") 
-             VALUES ($1, $2, $3, $4) 
+            `INSERT INTO games ("psnId", "psnName", "igdbName", "year", "igdbId") 
+             VALUES ($1, $2, $3, $4, $5) 
              ON CONFLICT ("psnId") DO NOTHING`,
-            [game.psnId, game.name, releaseYear, igdbId]
+            [game.psnId, game.name, igdbGame.name, releaseYear, igdbId]
           );
         } catch (error) {
           console.error(`ERROR inserting ${game.mame}:`, error);

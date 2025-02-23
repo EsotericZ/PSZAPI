@@ -9,7 +9,7 @@ export const getAllFeatured = async (req, res) => {
       SELECT 
         F.description, F.order, 
         I."igdbId", I.name, I.cover, I.esrb, I.rating AS "igdbRating", I.released, I.slug, I.genres, I.storyline, I.summary,
-        G.id AS "gameId", G."totalRating", G."ratingCount", G."gotyCount",
+        G.id AS "gameId", G."psnName", G."totalRating", G."ratingCount", G."gotyCount",
         R.rating AS "pszRating", R.review, R.video,
         ${userId ? `
           EXISTS (

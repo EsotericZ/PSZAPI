@@ -6,11 +6,25 @@ export const getUserWishlist = async (req, res) => {
 
   try {
     const statement = `
-      SELECT I.*
+      SELECT 
+        I."igdbId", I.name, I.cover, I.esrb, I.rating AS "igdbRating", I.released, I.slug, I.genres, I.storyline, I.summary,
+        G."psnName", G."totalRating", G."ratingCount", G."gotyCount",
+        R.rating AS "pszRating", R.review, R.video,
+        ${userId ? `
+          EXISTS (
+            SELECT 1 FROM backlog B 
+            WHERE B."gameId" = G.id 
+            AND B."userId" = $1
+          ) AS "backlog"
+        ` : 'FALSE AS "backlog"'}
       FROM wishlist W
-      JOIN games G ON W."gameId" = G.id
-      JOIN igdb I ON G."igdbId" = I."igdbId"
-      WHERE "userId" = $1
+      LEFT JOIN games G 
+        ON W."gameId" = G.id
+      JOIN igdb I 
+        ON G."igdbId" = I."igdbId"
+      LEFT JOIN reviews R 
+        ON G.id = R."gameId"
+      WHERE "userId" = $1;
     `;
     const result = await query(statement, [userId]);
 
@@ -49,10 +63,10 @@ export const updateWishlist = async (req, res) => {
       : null;
     
       const insertGame = await query(`
-        INSERT INTO games ("igdbId", year) 
-        VALUES ($1, $2)
+        INSERT INTO games ("igdbId", "igdbName", year) 
+        VALUES ($1, $2, $3)
         RETURNING id
-      `, [igdbResults.igdbId, releaseYear]);
+      `, [igdbResults.igdbId, igdbResults.name, releaseYear]);
     
       gameId = insertGame.rows[0].id;
     } else {
